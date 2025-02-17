@@ -20,7 +20,7 @@ var player;
 var cursors;
 var jumpSpeed = -300;  // Velocitat del salt
 var moveSpeed = 160;   // Velocitat de moviment
-var friction = 0.85;   // Factor de fricció per a l'efecte de relliscament
+var friction = 0.5;    // Factor de fricció per a l'efecte de relliscament
 
 function preload() {
     this.load.image('player', 'imatge.png');  // Carrega la imatge del personatge
@@ -30,7 +30,8 @@ function create() {
     // Crea el jugador
     player = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'player');
     player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
-    player.setDrag(1000, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
+    player.setBounce(0.1);  // Potència del rebote
+    player.setDrag(500, 0);  // Fricció per evitar que el jugador es mogui massa ràpid
 
     // Configura les teclas de moviment
     cursors = this.input.keyboard.addKeys({
