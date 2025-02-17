@@ -1,12 +1,32 @@
 body {
-    text-align: center;
+    margin: 0;
     overflow: hidden;
 }
-.contenidor {
+
+.escenari {
     position: relative;
     width: 100vw;
     height: 100vh;
 }
+
+.cel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 75%; /* El cel ocupa la part superior */
+    background-color: #87CEEB; /* Color del cel (cel blau clar) */
+}
+
+.terra {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 25%; /* La terra ocupa la part inferior */
+    background-color: #228B22; /* Color de la terra (verd) */
+}
+
 .imatge {
     position: absolute;
     top: 50%;
