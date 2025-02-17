@@ -18,6 +18,9 @@ var config = {
 
 var player;
 var cursors;
+var jumpSpeed = -300;  // Velocitat del salt
+var moveSpeed = 160;   // Velocitat de moviment
+var friction = 0.85;   // Factor de fricció per a l'efecte de relliscament
 
 function preload() {
     this.load.image('player', 'imatge.png');  // Carrega la imatge del personatge
@@ -27,6 +30,7 @@ function create() {
     // Crea el jugador
     player = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'player');
     player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
+    player.setDrag(1000, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
 
     // Configura les teclas de moviment
     cursors = this.input.keyboard.addKeys({
@@ -40,20 +44,21 @@ function create() {
 }
 
 function update() {
-    // Moviment cap a l'esquerra i dreta
+    // Moviment cap a l'esquerra i dreta amb un efecte de relliscament
     if (cursors.left.isDown) {
-        player.setVelocityX(-160);  // Moviment cap a l'esquerra
+        player.setVelocityX(-moveSpeed);  // Moviment cap a l'esquerra
     }
     else if (cursors.right.isDown) {
-        player.setVelocityX(160);  // Moviment cap a la dreta
+        player.setVelocityX(moveSpeed);  // Moviment cap a la dreta
     }
     else {
-        player.setVelocityX(0);  // Aturar el moviment si no es prem cap tecla
+        // Si no es prem cap tecla, aplica fricció per aturar el moviment
+        player.setVelocityX(player.body.velocity.x * friction);
     }
 
     // Salt (només si el jugador està a terra)
     if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-300);  // Salt
+        player.setVelocityY(jumpSpeed);  // Salt
     }
 }
 
