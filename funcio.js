@@ -20,14 +20,19 @@ var player;
 var cursors;
 var jumpSpeed = -300;  // Velocitat del salt
 var moveSpeed = 160;   // Velocitat de moviment
-var friction = 0.5;    // Factor de fricció per a l'efecte de relliscament
 
 function preload() {
-    this.load.image('player', 'imatge.png');  // Carrega la imatge del personatge
+    // Assegurem-nos que la imatge del personatge es carrega correctament
+    this.load.image('player', 'imatge.png');
 }
 
 function create() {
-    // Crea el jugador
+    // Comprovem si la imatge s'ha carregat
+    if (!this.textures.exists('player')) {
+        console.error("Imatge del personatge no trobada!");
+    }
+
+    // Crea el jugador amb les propietats inicials
     player = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'player');
     player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     player.setBounce(0.1);  // Potència del rebote
@@ -40,8 +45,8 @@ function create() {
         up: Phaser.Input.Keyboard.KeyCodes.SPACE
     });
 
-    // Fons i terra
-    this.add.rectangle(0, window.innerHeight - 50, window.innerWidth, 50, 0x228B22).setOrigin(0, 0);  // Terra
+    // Afegim terra per a que el jugador pugui col·lidir amb ell
+    this.add.rectangle(0, window.innerHeight - 50, window.innerWidth, 50, 0x228B22).setOrigin(0, 0).setDepth(0);
 }
 
 function update() {
@@ -54,7 +59,7 @@ function update() {
     }
     else {
         // Si no es prem cap tecla, aplica fricció per aturar el moviment
-        player.setVelocityX(player.body.velocity.x * friction);
+        player.setVelocityX(player.body.velocity.x * 0.9);  // Apliqueu un factor de fricció
     }
 
     // Salt (només si el jugador està a terra)
