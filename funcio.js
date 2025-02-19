@@ -32,6 +32,7 @@ function create() {
     let gameWidth = this.scale.width;
     let gameHeight = this.scale.height;
     player = this.physics.add.sprite(gameWidth / 2, gameHeight / 2, 'player');
+    player.setDepth(1);
     player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     player.setDrag(1000, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
 
@@ -44,8 +45,13 @@ function create() {
 
     // Fons i terra
     // Creem el terra amb física
+    this.add.rectangle(0, 0, gameWidth, gameHeight, 0x87CEEB).setOrigin(0, 0);
+    // Crear el terra amb física
     let terra = this.physics.add.staticGroup();
     terra.create(gameWidth / 2, gameHeight - 25, null).setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
+
+    // Fer que el jugador col·lideixi amb el terra
+    this.physics.add.collider(player, terra);
 
 }
 
