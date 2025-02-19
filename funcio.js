@@ -23,9 +23,12 @@ var jumpSpeed = -800;  // Velocitat del salt
 var moveSpeed = 200;   // Velocitat de moviment
 var friction = 0.99;   // Factor de fricció per a l'efecte de relliscament
 var clickStartTime = 0;  // Temps de l'inici del clic
-var maxForce = 800;     // Força màxima a aplicar
-var minForce = 300;
+var maxForce = 1000;     // Força màxima a aplicar
+var minForce = 200;      // Força mínima a aplicar
 var isClicking = false;  // Si s'està mantenint el clic
+var clickDuration = 0;   // Temps de durada del clic
+var maxClickTime = 1000; // Temps màxim per mantenir el clic (en mil·lisegons)
+var VelForçaClick = 0.6;
 
 function preload() {
     this.load.image('player', './imatges/imatge.png');  // Carrega la imatge del personatge
@@ -59,18 +62,10 @@ function create() {
     // Quan es deixa anar el clic, calcular la força proporcional i aplicar-la
     this.input.on('pointerup', (pointer) => {
         if (pointer.leftButtonReleased()) {
-            let clickDuration = this.time.now - clickStartTime;  // Temps de durada del clic
-            let force = Math.min(Math.max(clickDuration, minForce), maxForce);  // Força proporcional, amb mínim i màxim
-            // Obtenim la posició del ratolí
-            let mouseX = pointer.x;
-            let mouseY = pointer.y;
-
-            // Calcula el vector des del jugador fins al ratolí
-            let deltaX = mouseX - player.x;
-            let deltaY = mouseY - player.y;
-
-            aplicaForça([deltaX, deltaY], force);  // Crida a la funció `aplicaForça` amb la força calculada
             isClicking = false;  // Reinicia el clic
+            // Si el temps de clic supera el màxim, aplica la força màxima automàticament
+            let força = Math.min(Math.max(clickDuration * VelForçaClick, minForce), maxForce);  
+            applyForce(calculavecJugadorRatoli(), força);
         }
     });
 
@@ -96,14 +91,34 @@ function normalitzarVector(vector) {
     // Normalitzar el vector dividint cada component per la norma
     return [vector[0] / norma, vector[1] / norma];
 }
+function calculavecJugadorRatoli()
+{
+    let mouseX = game.input.activePointer.x;
+    let mouseY = game.input.activePointer.y;
+    let deltaX = mouseX - player.x;
+    let deltaY = mouseY - player.y;
+    return [deltaX, deltaY];
+}
 
-function aplicaForça(vector, força) {
+function applyForce(vector, force) {
     let vectorNorm = normalitzarVector(vector);
-    player.setVelocityX(player.body.velocity.x + vectorNorm[0] * força);
-    player.setVelocityY(player.body.velocity.y + vectorNorm[1] * força);
+    player.setVelocityX(player.body.velocity.x + vectorNorm[0] * force);
+    player.setVelocityY(player.body.velocity.y + vectorNorm[1] * force);
 }
 
 function update() {
+    // Si estem mantenint el clic, actualitza la durada del clic
+    if (isClicking) {
+        clickDuration = this.time.now - clickStartTime;
+
+        // Quan el clic arribi al temps màxim, aplica la força màxima automàticament
+        if (clickDuration * VelForçaClick >= maxClickTime) {
+            let força = maxForce;
+            applyForce(calculavecJugadorRatoli(), força);  // Aplica força màxima automàticament
+            isClicking = false;  // Deté el clic automàticament quan arriba al màxim
+        }
+    }
+
     // Moviment cap a l'esquerra i dreta amb un efecte de relliscament
     if (cursors.left.isDown && player.body.touching.down) {
         player.setVelocityX(-moveSpeed);  // Moviment cap a l'esquerra
