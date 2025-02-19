@@ -2,6 +2,7 @@ var config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
+    parent: "game-container",
     physics: {
         default: 'arcade',
         arcade: {
@@ -28,7 +29,9 @@ function preload() {
 
 function create() {
     // Crea el jugador
-    player = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'player');
+    let gameWidth = this.scale.width;
+    let gameHeight = this.scale.height;
+    player = this.physics.add.sprite(gameWidth / 2, gameHeight / 2, 'player');
     player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     player.setDrag(1000, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
 
@@ -40,7 +43,10 @@ function create() {
     });
 
     // Fons i terra
-    this.add.rectangle(0, window.innerHeight - 50, window.innerWidth, 50, 0x228B22).setOrigin(0, 0);  // Terra
+    // Creem el terra amb física
+    let terra = this.physics.add.staticGroup();
+    terra.create(gameWidth / 2, gameHeight - 25, null).setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
+
 }
 
 function update() {
