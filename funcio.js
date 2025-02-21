@@ -29,6 +29,12 @@ var isClicking = false;  // Si s'està mantenint el clic
 var clickDuration = 0;   // Temps de durada del clic
 var maxClickTime = 1000; // Temps màxim per mantenir el clic (en mil·lisegons)
 var VelForçaClick = 0.6;
+var ClickCooldown = 5000;
+var tempsEntreCooldown = 0;
+var tempsIniciCooldown = 0;
+var estaEnAigua = false;
+var jugadorPotMoures = true;
+var potFerHabilitat = false;
 
 function preload() {
     this.load.image('player', './imatges/imatge.png');  // Carrega la imatge del personatge
@@ -53,19 +59,25 @@ function create() {
 
     // Quan es fa clic, guardar el temps d'inici del clic
     this.input.on('pointerdown', (pointer) => {
-        if (pointer.leftButtonDown()) {
-            isClicking = true;
-            clickStartTime = this.time.now;  // Inici del temps de clic
+        if (pointer.leftButtonDown()) { 
+            if (potFerHabilitat) {
+                isClicking = true;
+                clickStartTime = this.time.now;  // Inici del temps de clic
+            }
         }
     });
 
     // Quan es deixa anar el clic, calcular la força proporcional i aplicar-la
     this.input.on('pointerup', (pointer) => {
         if (pointer.leftButtonReleased()) {
-            isClicking = false;  // Reinicia el clic
-            // Si el temps de clic supera el màxim, aplica la força màxima automàticament
-            let força = Math.min(Math.max(clickDuration * VelForçaClick, minForce), maxForce);  
-            applyForce(calculavecJugadorRatoli(), força);
+            if (potFerHabilitat) {
+                isClicking = false;  // Reinicia el clic
+                let força = Math.min(Math.max(clickDuration * VelForçaClick, minForce), maxForce);  
+                aplicaForça(calculavecJugadorRatoli(), força);
+                clickDuration = 0; // Reset del temps de clic
+                potFerHabilitat = false;
+                tempsEntreCooldown = 0;
+            }
         }
     });
 
@@ -75,8 +87,21 @@ function create() {
     let terra = this.physics.add.staticGroup();
     terra.create(gameWidth / 2, gameHeight - 25, null).setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
 
+    aigua = this.physics.add.staticGroup();
+    let aiguaObj = aigua.create(gameWidth / 2, gameHeight - 100, null)
+        .setDisplaySize(gameWidth / 2, 50).setOrigin(0.5, 0).refreshBody();
+
     // Fer que el jugador col·lideixi amb el terra
     this.physics.add.collider(player, terra);
+
+    this.physics.add.overlap(player, aigua, dinsAigua, null, this);
+}
+
+function dinsAigua() {
+    if (!estaEnAigua) { 
+        estaEnAigua = true;
+    }
+    aplicaForça([0,-1],10);
 }
 
 function normalitzarVector(vector) {
@@ -100,29 +125,39 @@ function calculavecJugadorRatoli()
     return [deltaX, deltaY];
 }
 
-function applyForce(vector, force) {
+function aplicaForça(vector, force) {
     let vectorNorm = normalitzarVector(vector);
     player.setVelocityX(player.body.velocity.x + vectorNorm[0] * force);
     player.setVelocityY(player.body.velocity.y + vectorNorm[1] * force);
 }
 
-function update() {
-    // Si estem mantenint el clic, actualitza la durada del clic
-    if (isClicking) {
-        clickDuration = this.time.now - clickStartTime;
-
-        // Quan el clic arribi al temps màxim, aplica la força màxima automàticament
-        if (clickDuration * VelForçaClick >= maxClickTime) {
-            let força = maxForce;
-            applyForce(calculavecJugadorRatoli(), força);  // Aplica força màxima automàticament
-            isClicking = false;  // Deté el clic automàticament quan arriba al màxim
+function comprovaReduirCooldown(delta)
+{
+    if (estaEnAigua && !potFerHabilitat)
+    {
+        tempsEntreCooldown += delta;
+        if (tempsEntreCooldown >= ClickCooldown)
+        {
+            potFerHabilitat = true;
+            tempsEntreCooldown = 0;
         }
     }
+}
+
+function update(time, delta) {
+    // Si estem mantenint el clic, actualitza la durada del clic
+    if (isClicking) {
+        clickDuration += delta;
+    }
+    comprovaReduirCooldown(delta);
+
+    estaEnAigua = this.physics.overlap(player, aigua);
+    jugadorPotMoures = estaEnAigua;
 
     // Moviment cap a l'esquerra i dreta amb un efecte de relliscament
-    if (cursors.left.isDown && player.body.touching.down) {
+    if (cursors.left.isDown && jugadorPotMoures) {
         player.setVelocityX(-moveSpeed);  // Moviment cap a l'esquerra
-    } else if (cursors.right.isDown && player.body.touching.down) {
+    } else if (cursors.right.isDown && jugadorPotMoures) {
         player.setVelocityX(moveSpeed);  // Moviment cap a la dreta
     } else if (player.body.touching.down) {
         // Si el jugador està a terra i no es prem cap tecla, aplica més fricció
