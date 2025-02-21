@@ -35,9 +35,13 @@ var tempsIniciCooldown = 0;
 var estaEnAigua = false;
 var jugadorPotMoures = true;
 var potFerHabilitat = false;
+var aigua;
+var terra;
 
 function preload() {
     this.load.image('player', './imatges/vaixell1.png');  // Carrega la imatge del personatge
+    this.load.image('terra', './imatges/sorreta.png');  // Imatge del terra
+    this.load.image('aigua', './imatges/aguita.png'); // imatge de l'aigua
 }
 
 function create() {
@@ -46,10 +50,10 @@ function create() {
     let gameHeight = this.scale.height;
     player = this.physics.add.sprite(gameWidth / 2, gameHeight / 2, 'player');
     player.setDepth(1);
-    player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
+    // player.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     player.setDrag(10, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
     player.setMaxVelocity(1000, 1000);
-
+    this.cameras.main.startFollow(player, false, 0.1, 0.1);
     // Configura les tecles de moviment
     cursors = this.input.keyboard.addKeys({
         left: Phaser.Input.Keyboard.KeyCodes.A,
@@ -81,19 +85,22 @@ function create() {
         }
     });
 
-    // Fons i terra
-    this.add.rectangle(0, 0, gameWidth, gameHeight, 0x87CEEB).setOrigin(0, 0);
+    // Fons
+    this.add.rectangle(0, 0, 20000, 20000, 0x87CEEB).setOrigin(0, 0);
     // Crear el terra amb física
     let terra = this.physics.add.staticGroup();
-    terra.create(gameWidth / 2, gameHeight - 25, null).setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
+    let terraObj = terra.create(gameWidth / 2, gameHeight - 25, 'terra')
+        .setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
 
+    // Crear aigua amb imatge i física
     aigua = this.physics.add.staticGroup();
-    let aiguaObj = aigua.create(gameWidth / 2, gameHeight - 100, null)
+    let aiguaObj = aigua.create(gameWidth / 2, gameHeight - 100, 'aigua')
         .setDisplaySize(gameWidth / 2, 50).setOrigin(0.5, 0).refreshBody();
 
     // Fer que el jugador col·lideixi amb el terra
     this.physics.add.collider(player, terra);
 
+    // Detectar quan el jugador toca l’aigua
     this.physics.add.overlap(player, aigua, dinsAigua, null, this);
 }
 
