@@ -37,7 +37,7 @@ var jugadorPotMoures = true;
 var potFerHabilitat = false;
 
 function preload() {
-    this.load.image('player', './imatges/imatge.png');  // Carrega la imatge del personatge
+    this.load.image('player', './imatges/vaixell1.png');  // Carrega la imatge del personatge
 }
 
 function create() {
