@@ -36,25 +36,32 @@ var potFerHabilitat = false;
 
 var textDebugar;
 
-var aigua;
-var terra;
+var capaAigua;
+var capaTerra;
+var mapa;
+const rutaMapa = './nivells/mapa_intent_3.json';
+
 
 function preload() {
     this.load.image('jugador', './imatges/vaixell1.png');  // Carrega la imatge del personatge
-    this.load.image('terra', './imatges/sorreta.png');  // Imatge del terra
-    this.load.image('aigua', './imatges/aguita.png'); // imatge de l'aigua
+    this.load.tilemapTiledJSON('mapa', rutaMapa);
+
+    this.load.image('caselles', './imatges/tileset loco.png'); // Carrega la imatge del tileset
+    
 }
 
 function create() {
     // Crea el jugador
     let gameWidth = this.scale.width;
     let gameHeight = this.scale.height;
-    jugador = this.physics.add.sprite(gameWidth / 2, gameHeight / 2, 'jugador');
+    jugador = this.physics.add.sprite(100, 100, 'jugador');
     jugador.setDepth(1);
     // jugador.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     jugador.setDrag(10, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
     jugador.setMaxVelocity(1000, 1000);
     this.cameras.main.startFollow(jugador, false, 0.1, 0.1, 0, 50);
+    this.cameras.main.setBackgroundColor(0x87CEEB); // Blau cel
+
     // Configura les tecles de moviment
     cursors = this.input.keyboard.addKeys({
         left: Phaser.Input.Keyboard.KeyCodes.A,
@@ -102,31 +109,62 @@ function create() {
         }
     });
 
-    // Fons
-    this.add.rectangle(0, 0, 20000, 20000, 0x87CEEB).setOrigin(0, 0);
+    mapa = this.make.tilemap({ key: 'mapa', tileWidth: 64, tileHeight: 64 });
+
+    // Si el mapa s'ha creat bé, imprimiu les capes disponibles
+    let tileset = mapa.addTilesetImage('caselles_1', 'caselles');
+
+    capaTerra = mapa.createLayer('terra', tileset, 0, 0);
+    capaAigua = mapa.createLayer('aigua', tileset, 0, 0);
+    
+    // Aplica les propietats de col·lisió a la capa "terra" si els tiles tenen la propietat "collides" definida
+    // capaTerra.setCollisionByProperty({ collides: true });
+    
+    // Afegir col·lisió amb el jugador (suposant que "jugador" ja s'ha creat)
+    this.physics.add.collider(jugador, capaTerra);
+    capaTerra.setCollisionBetween(10,11);
+
+    // Per la capa "aigua", si vols detectar quan el jugador hi entra, utilitza un overlap
+    // this.physics.add.overlap(jugador, capaAigua, dinsAigua, null, this);
+
+
+    /*
+    //Fons
+    //this.add.rectangle(0, 0, 20000, 20000, 0x87CEEB).setOrigin(0, 0);
     // Crear el terra amb física
     let terra = this.physics.add.staticGroup();
-    let terraObj = terra.create(gameWidth / 2, gameHeight - 25, 'terra')
-        .setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
+    // let terraObj = terra.create(gameWidth / 2, gameHeight - 25, 'terra')
+    //     .setDisplaySize(gameWidth, 50).setOrigin(0.5, 0).refreshBody();
 
     // Crear aigua amb imatge i física
     aigua = this.physics.add.staticGroup();
-    let aiguaObj = aigua.create(gameWidth / 2, gameHeight - 100, 'aigua')
-        .setDisplaySize(gameWidth / 2, 50).setOrigin(0.5, 0).refreshBody();
-
+    // let aiguaObj = aigua.create(gameWidth / 2, gameHeight - 100, 'aigua')
+    //     .setDisplaySize(gameWidth / 2, 50).setOrigin(0.5, 0).refreshBody();
+    
     // Fer que el jugador col·lideixi amb el terra
     this.physics.add.collider(jugador, terra);
 
     // Detectar quan el jugador toca l’aigua
     this.physics.add.overlap(jugador, aigua, dinsAigua, null, this);
+    */
+    
 }
 
 function dinsAigua() {
-    if (!estaEnAigua) { 
-        estaEnAigua = true;
-    }
-    aplicaForça([0,-1],10);
+    let forçaFlotabilitat = 500; // Ajustable segons el que necessitis
+    let resistència = 0.99; // Ajustable per simular la resistència de l'aigua
+
+    // Flotabilitat: Sempre aplica una petita força cap amunt per compensar la gravetat
+    aplicaForça([0, -1], forçaFlotabilitat * 0.02);
+
+    // Aplicar resistència a l’aigua (redueix la velocitat horitzontal)
+    // aplicaForça([-jugador.body.velocity.x, 0], (1 - resistència) * Math.abs(jugador.body.velocity.x));
+
+    // Opcional: Pots afegir més resistència en la direcció Y si vols que freni també en vertical
+    aplicaForça([0, -jugador.body.velocity.y], (1 - resistència) * Math.abs(jugador.body.velocity.y));
 }
+
+
 
 function normalitzarVector(vector) {
     // Calcular la norma (mòdul) del vector
@@ -169,6 +207,14 @@ function comprovaReduirCooldown(delta)
     }
 }
 
+function jugadorEstaEnAigua() {
+    let hitboxJugador = new Phaser.Geom.Rectangle(jugador.x, jugador.y, jugador.width, jugador.height);
+    let tilesAigua = capaAigua.getTilesWithinShape(hitboxJugador, { isNotEmpty: true });
+
+    return tilesAigua.length > 0; // Si hi ha alguna tile d'aigua, retorna true
+}
+
+
 function update(time, delta) {
     // Si estem mantenint el clic, actualitza la durada del clic
     if (isClicking) {
@@ -176,7 +222,12 @@ function update(time, delta) {
     }
     comprovaReduirCooldown(delta);
 
-    estaEnAigua = this.physics.overlap(jugador, aigua);
+    estaEnAigua = jugadorEstaEnAigua();
+    if (estaEnAigua)
+    {
+        dinsAigua();
+    }
+
     jugadorPotMoures = estaEnAigua;
 
     // Moviment cap a l'esquerra i dreta amb un efecte de relliscament
