@@ -46,7 +46,7 @@ function preload() {
     this.load.image('jugador', './imatges/vaixell1.png');  // Carrega la imatge del personatge
     this.load.tilemapTiledJSON('mapa', rutaMapa);
 
-    this.load.image('caselles', './imatges/tileset loco.png'); // Carrega la imatge del tileset
+    this.load.image('caselles', './imatges/tileset_loco_2.png'); // Carrega la imatge del tileset
     
 }
 
@@ -54,7 +54,7 @@ function create() {
     // Crea el jugador
     let gameWidth = this.scale.width;
     let gameHeight = this.scale.height;
-    jugador = this.physics.add.sprite(100, 100, 'jugador');
+    jugador = this.physics.add.sprite(300, 12500, 'jugador');
     jugador.setDepth(1);
     // jugador.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     jugador.setDrag(10, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
@@ -112,7 +112,7 @@ function create() {
     mapa = this.make.tilemap({ key: 'mapa', tileWidth: 64, tileHeight: 64 });
 
     // Si el mapa s'ha creat bé, imprimiu les capes disponibles
-    let tileset = mapa.addTilesetImage('caselles_1', 'caselles');
+    let tileset = mapa.addTilesetImage('Caselles_2', 'caselles');
 
     capaTerra = mapa.createLayer('terra', tileset, 0, 0);
     capaAigua = mapa.createLayer('aigua', tileset, 0, 0);
@@ -122,7 +122,11 @@ function create() {
     
     // Afegir col·lisió amb el jugador (suposant que "jugador" ja s'ha creat)
     this.physics.add.collider(jugador, capaTerra);
-    capaTerra.setCollisionBetween(10,11);
+    capaTerra.setCollisionBetween(3,6);
+    capaTerra.setCollisionBetween(9,12);
+    capaTerra.setCollisionBetween(15,18);
+    capaTerra.setCollisionBetween(28,30);
+    capaTerra.setCollisionBetween(34,36);
 
     // Per la capa "aigua", si vols detectar quan el jugador hi entra, utilitza un overlap
     // this.physics.add.overlap(jugador, capaAigua, dinsAigua, null, this);
