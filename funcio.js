@@ -39,12 +39,12 @@ var textDebugar;
 var capaAigua;
 var capaTerra;
 var mapa;
-const rutaMapa = './nivells/mapa_intent_3.json';
+
 
 
 function preload() {
     this.load.image('jugador', './imatges/vaixell1.png');  // Carrega la imatge del personatge
-    this.load.tilemapTiledJSON('mapa', rutaMapa);
+    this.load.tilemapTiledJSON('mapa', './nivells/mapa_intent_3.json');
 
     this.load.image('caselles', './imatges/tileset_loco_2.png'); // Carrega la imatge del tileset
     
