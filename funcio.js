@@ -54,7 +54,7 @@ function create() {
     // Crea el jugador
     let gameWidth = this.scale.width;
     let gameHeight = this.scale.height;
-    jugador = this.physics.add.sprite(300, 12500, 'jugador');
+    jugador = this.physics.add.sprite(300, 12000, 'jugador');
     jugador.setDepth(1);
     // jugador.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
     jugador.setDrag(10, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
