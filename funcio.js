@@ -155,8 +155,8 @@ function create() {
 }
 
 function dinsAigua() {
-    let forçaFlotabilitat = 500; // Ajustable segons el que necessitis
-    let resistència = 0.99; // Ajustable per simular la resistència de l'aigua
+    let forçaFlotabilitat = 500;
+    let resistència = 0.99;
 
     // Flotabilitat: Sempre aplica una petita força cap amunt per compensar la gravetat
     aplicaForça([0, -1], forçaFlotabilitat * 0.02);
