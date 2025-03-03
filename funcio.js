@@ -28,7 +28,7 @@ var ForçaMin = 200;      // Força mínima a aplicar
 var isClicking = false;  // Si s'està mantenint el clic
 var TempsFentClick = 0;   // Temps de durada del clic
 var VelForçaClick = ForçaMax/ForçaMin/10; // mutiplicador de força per temps clickant (en 2s (ForçaMax/velForçaClick) s'arriba a max)
-var ClickCooldown = 3000; // temps per poder tornar a mantenir
+var ClickCooldown = 2000; // temps per poder tornar a mantenir
 var tempsEntreCooldown = 5000;
 var estaEnAigua = false;
 var jugadorPotMoures = true;
@@ -154,19 +154,24 @@ function create() {
     
 }
 
-function dinsAigua() {
-    let forçaFlotabilitat = 500;
-    let resistència = 0.99;
+function dinsAigua(tempsDelta) {
+    let deltaSegons = tempsDelta / 1000; // Convertim a segons
+    let forçaFlotabilitat = 700;  // Ajusta segons necessitat
+    let resistènciaCaiguda = 2; // Més resistència quan cau
+    let resistènciaPujada = 1; // Menys resistència quan puja
 
-    // Flotabilitat: Sempre aplica una petita força cap amunt per compensar la gravetat
-    aplicaForça([0, -1], forçaFlotabilitat * 0.02);
-
-    // Aplicar resistència a l’aigua (redueix la velocitat horitzontal)
-    // aplicaForça([-jugador.body.velocity.x, 0], (1 - resistència) * Math.abs(jugador.body.velocity.x));
-
-    // Opcional: Pots afegir més resistència en la direcció Y si vols que freni també en vertical
-    aplicaForça([0, -jugador.body.velocity.y], (1 - resistència) * Math.abs(jugador.body.velocity.y));
+    // Si està caient (velY > 0), apliquem més resistència
+    if (jugador.body.velocity.y > 0) {
+        aplicaForça([0, -1], forçaFlotabilitat * deltaSegons);
+        aplicaForça([0, -1], jugador.body.velocity.y * resistènciaCaiguda * deltaSegons);
+    } else {
+        // Si està pujant (velY < 0), apliquem menys resistència per evitar que surti disparat
+        aplicaForça([0, -1], forçaFlotabilitat * deltaSegons);
+        aplicaForça([0, -1], jugador.body.velocity.y * resistènciaPujada * deltaSegons);
+    }
 }
+
+
 
 
 
@@ -229,7 +234,7 @@ function update(time, delta) {
     estaEnAigua = jugadorEstaEnAigua();
     if (estaEnAigua)
     {
-        dinsAigua();
+        dinsAigua(delta);
     }
 
     jugadorPotMoures = estaEnAigua;
