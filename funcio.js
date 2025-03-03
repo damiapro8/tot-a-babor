@@ -61,6 +61,7 @@ function create() {
     jugador.setMaxVelocity(1000, 1000);
     this.cameras.main.startFollow(jugador, false, 0.1, 0.1, 0, 50);
     this.cameras.main.setBackgroundColor(0x87CEEB); // Blau cel
+    this.cameras.main.setZoom(0.6);
 
     // Configura les tecles de moviment
     cursors = this.input.keyboard.addKeys({
