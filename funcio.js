@@ -58,7 +58,7 @@ var mapa;
 
 function preload() {
     this.load.image('jugador', './imatges/vaixell1.png');  // Carrega la imatge del personatge
-    this.load.tilemapTiledJSON('mapa', './nivells/mapa_intent_3.json');
+    this.load.tilemapTiledJSON('mapa', './nivells/mapa_intent_4.json');
 
     this.load.image('caselles', './imatges/tileset_loco_2.png'); // Carrega la imatge del tileset
     
@@ -196,8 +196,7 @@ function create() {
             if (id !== socket.id) {
                 if (!altresJugadors[id]) {
                     let sprite = game.scene.scenes[0].add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
-                    sprite.setTintFill(0xff8800);
-                    sprite.setAlpha(0.9);
+                    sprite.setAlpha(0.8);
                     sprite.setDepth(0);
                     altresJugadors[id] = sprite;
                 } else {
