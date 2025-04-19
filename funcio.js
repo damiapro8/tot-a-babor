@@ -186,6 +186,33 @@ function create() {
     // Detectar quan el jugador toca l'aigua
     this.physics.add.overlap(jugador, aigua, dinsAigua, null, this);
     */
+
+    socket = io(); // Connecta amb el servidor
+
+    altresJugadors = {};
+
+    socket.on("state", function(jugadors) {
+        for (let id in jugadors) {
+            if (id !== socket.id) {
+                if (!altresJugadors[id]) {
+                    let sprite = game.scene.scenes[0].physics.add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
+                    sprite.setTint(0xff0000); // diferent color per distingir-los
+                    sprite.setDepth(0);
+                    altresJugadors[id] = sprite;
+                } else {
+                    altresJugadors[id].setPosition(jugadors[id].x, jugadors[id].y);
+                }
+            }
+        }
+
+        for (let id in altresJugadors) {
+            if (!jugadors[id]) {
+                altresJugadors[id].destroy();
+                delete altresJugadors[id];
+            }
+        }
+    });
+
     
 }
 
@@ -355,6 +382,10 @@ function update(time, delta) {
         `resMax: ${resMax} \n` +
         `resActual: ${resActual}`
     );
+
+    if (socket && socket.connected) {
+        socket.emit("update", { x: jugador.x, y: jugador.y });
+    }    
 }
 
 // Inicialitza el joc
