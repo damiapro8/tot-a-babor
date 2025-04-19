@@ -196,8 +196,8 @@ function create() {
             if (id !== socket.id) {
                 if (!altresJugadors[id]) {
                     let sprite = game.scene.scenes[0].add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
-                    sprite.setTintFill(0x88ccff);
-                    sprite.setAlpha(0.6);
+                    sprite.setTintFill(0xff8800);
+                    sprite.setAlpha(0.9);
                     sprite.setDepth(0);
                     altresJugadors[id] = sprite;
                 } else {
