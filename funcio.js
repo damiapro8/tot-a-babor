@@ -1,3 +1,4 @@
+// ############################ INICIALITZACIO PHASER #############################
 var config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -17,25 +18,38 @@ var config = {
     }
 };
 
+// ######################## OBJECTES PHASER #####################################
 var jugador;
 var cursors;
 
+// #################### PARAMETRES MOVIMENT ######################
 var velMoviment = 5;   // Velocitat de moviment
 var velMaxMoviment = 300; // Velocitat maxima per moures amb A i D (no limita lo altre)
 var friccio = 0.99;   // Factor de fricció per a l'efecte de relliscament
 var ForçaMax = 800;     // Força màxima a aplicar
-var ForçaMin = 200;      // Força mínima a aplicar
-var isClicking = false;  // Si s'està mantenint el clic
+var ForçaMin = 0;      // Força mínima a aplicar
+var faClick = false;  // Si s'està mantenint el clic
 var TempsFentClick = 0;   // Temps de durada del clic
-var VelForçaClick = ForçaMax/ForçaMin/10; // mutiplicador de força per temps clickant (en 2s (ForçaMax/velForçaClick) s'arriba a max)
-var ClickCooldown = 2000; // temps per poder tornar a mantenir
-var tempsEntreCooldown = 5000;
+var VelForçaClick = ForçaMax/2000; // mutiplicador de força per temps clickant (en 2s (ForçaMax/velForçaClick) s'arriba a max)
+
+// parametres resistencia
+var resMax = 1400; // resistencia maxima
+var resActual = 1400; // resistencia actual, puja fins a arribar a la maxima
+var velRecAigua = 0.3; // velocitat de recuperacio de resistencia en aigua per segon
+var velRecAire = 0.05; // velocitat de recuperacio de resistencia fora de aigua per segon
+
 var estaEnAigua = false;
 var jugadorPotMoures = true;
-var potFerHabilitat = false;
 
+// ################################ UI ###########################
 var textDebugar;
+var fonsBarra;
+var barraResistencia;
+var barraResistenciaPrevista;
+var ampladaBarra = 300;
+var alçadaBarra = 30;
 
+// ############################# TILEMAP ###########################
 var capaAigua;
 var capaTerra;
 var mapa;
@@ -79,9 +93,29 @@ function create() {
         padding: { x: 10, y: 5 }
     }).setScrollFactor(0);
 
+    //UI
     textDebugar.setDepth(100); // Assegura que el text estigui al davant de tot
     textDebugar.setVisible(false); // Oculta el text en iniciar
     debugKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P); // `'` en teclats espanyols
+
+    let posXBarra = jugador.x - ampladaBarra / 2;
+    let posYBarra = jugador.y - jugador.height - 30;
+
+    fonsBarra = this.add.rectangle(posXBarra, posYBarra, ampladaBarra, alçadaBarra, 0x444444);
+    fonsBarra.setOrigin(0, 0);
+    fonsBarra.setScrollFactor(1);
+
+    barraResistencia = this.add.rectangle(posXBarra, posYBarra, ampladaBarra, alçadaBarra, 0x00ff00);
+    barraResistencia.setOrigin(0, 0);
+    barraResistencia.setScrollFactor(1);
+
+    barraResistenciaPrevista = this.add.rectangle(posXBarra, posYBarra, 0, alçadaBarra, 0xff9999);
+    barraResistenciaPrevista.setOrigin(0, 0);
+    barraResistenciaPrevista.setScrollFactor(1);
+
+    fonsBarra.setDepth(1000);
+    barraResistencia.setDepth(1001);
+    barraResistenciaPrevista.setDepth(1002);
 
 
     
@@ -89,8 +123,8 @@ function create() {
     // Quan es fa clic, guardar el temps d'inici del clic
     this.input.on('pointerdown', (pointer) => {
         if (pointer.leftButtonDown()) { 
-            if (potFerHabilitat) {
-                isClicking = true;
+            if (!faClick) {
+                faClick = true;
                 TempsFentClick = 0;
             }
         }
@@ -99,13 +133,13 @@ function create() {
     // Quan es deixa anar el clic, calcular la força proporcional i aplicar-la
     this.input.on('pointerup', (pointer) => {
         if (pointer.leftButtonReleased()) {
-            if (potFerHabilitat) {
-                isClicking = false;  // Reinicia el clic
-                let força = Math.min(Math.max(TempsFentClick * VelForçaClick, ForçaMin), ForçaMax);  
+            if (faClick) {
+                faClick = false;  // Reinicia el clic
+                let força = Math.min(Math.max(TempsFentClick * VelForçaClick, ForçaMin), Math.min(ForçaMax, resActual));  
                 aplicaForça(calculavecJugadorRatoli(this), força);
                 TempsFentClick = 0; // Reset del temps de clic
-                potFerHabilitat = false;
-                tempsEntreCooldown = 0;
+                resActual -= força;
+                potFerHabilitat = true;
             }
         }
     });
@@ -149,7 +183,7 @@ function create() {
     // Fer que el jugador col·lideixi amb el terra
     this.physics.add.collider(jugador, terra);
 
-    // Detectar quan el jugador toca l’aigua
+    // Detectar quan el jugador toca l'aigua
     this.physics.add.overlap(jugador, aigua, dinsAigua, null, this);
     */
     
@@ -206,16 +240,26 @@ function aplicaForça(vector, force) {
 
 function comprovaReduirCooldown(delta)
 {
-    if (estaEnAigua && !potFerHabilitat)
+    if (estaEnAigua)
     {
-        tempsEntreCooldown += delta;
-        if (tempsEntreCooldown >= ClickCooldown)
-        {
-            potFerHabilitat = true;
-            tempsEntreCooldown = 0;
-        }
+        resActual += velRecAigua * delta;
     }
+    else
+    {
+        resActual += velRecAire * delta;
+    }
+
+    if (resActual > resMax)
+    {
+        resActual = resMax;
+    }
+
+    // Mostrar la barra si estem clicant o si la resistència no és plena
+    let visible = faClick || resActual < resMax;
+    barraResistencia.setVisible(visible);
+    fonsBarra.setVisible(visible);
 }
+
 
 function jugadorEstaEnAigua() {
     let hitboxJugador = new Phaser.Geom.Rectangle(jugador.x, jugador.y, jugador.width, jugador.height);
@@ -224,10 +268,47 @@ function jugadorEstaEnAigua() {
     return tilesAigua.length > 0; // Si hi ha alguna tile d'aigua, retorna true
 }
 
+function actualitzaBarraRes()
+{
+    let posXBarra = jugador.x - ampladaBarra / 2;
+    let posYBarra = jugador.y - jugador.height - 30;
+    fonsBarra.setPosition(posXBarra, posYBarra);
+    barraResistencia.setPosition(posXBarra, posYBarra);
+
+    // Actualitzar barra de resistència actual
+    let percentatge = resActual / resMax;
+    let novaAmplada = ampladaBarra * percentatge;
+    barraResistencia.width = novaAmplada;
+
+    // Actualitzar barra de resistència prevista
+    if (faClick) {
+        let forçaPrevista = Math.min(Math.max(TempsFentClick * VelForçaClick, ForçaMin), Math.min(ForçaMax, resActual));
+        let percentatgePrevist = forçaPrevista / resMax;
+        let ampladaPrevista = ampladaBarra * percentatgePrevist;
+        
+        // Posicionar la barra prevista a l'esquerra de la barra actual
+        barraResistenciaPrevista.width = ampladaPrevista;
+        barraResistenciaPrevista.setPosition(posXBarra + novaAmplada - ampladaPrevista, posYBarra);
+
+        barraResistenciaPrevista.setVisible(true);
+    } else {
+        barraResistenciaPrevista.setVisible(false);
+    }
+
+    // Color canvia segons nivell de resistència
+    if (percentatge > 0.5) {
+        barraResistencia.fillColor = 0x00ff00; // verd
+    } else if (percentatge > 0.25) {
+        barraResistencia.fillColor = 0xffff00; // groc
+    } else {
+        barraResistencia.fillColor = 0xff0000; // vermell
+    }
+}
+
 
 function update(time, delta) {
     // Si estem mantenint el clic, actualitza la durada del clic
-    if (isClicking) {
+    if (faClick) {
         TempsFentClick += delta;
     }
     comprovaReduirCooldown(delta);
@@ -266,12 +347,13 @@ function update(time, delta) {
     if (Phaser.Input.Keyboard.JustDown(debugKey)) {
         textDebugar.setVisible(!textDebugar.visible); // Alterna la visibilitat
     }
+    actualitzaBarraRes();
     textDebugar.setText(
         `VelX: ${jugador.body.velocity.x.toFixed(2)}\n` +
         `VelY: ${jugador.body.velocity.y.toFixed(2)}\n` +
         `Temps Click: ${TempsFentClick.toFixed(2)} ms\n` +
-        `Pot fer habilitat: ${potFerHabilitat} \n` +
-        `Cooldown: ${tempsEntreCooldown}`
+        `resMax: ${resMax} \n` +
+        `resActual: ${resActual}`
     );
 }
 
