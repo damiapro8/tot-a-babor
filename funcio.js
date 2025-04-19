@@ -195,11 +195,13 @@ function create() {
         for (let id in jugadors) {
             if (id !== socket.id) {
                 if (!altresJugadors[id]) {
-                    let sprite = game.scene.scenes[0].add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
+                    let sprite = game.scene.scenes[0].physics.add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
                     player.setTintFill(0x88ccff); // blau fluix
                     player.setAlpha(0.6); // una mica transparent
                     sprite.setDepth(0);
                     altresJugadors[id] = sprite;
+                    sprite.body.setAllowGravity(false);
+                    sprite.body.moves = false; // no volem que la física el mogui gens
                 } else {
                     altresJugadors[id].setPosition(jugadors[id].x, jugadors[id].y);
                 }
