@@ -7,7 +7,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 500 },  // Gravetat
+            gravity: { y: 500 },
             debug: false
         }
     },
@@ -54,6 +54,10 @@ var capaAigua;
 var capaTerra;
 var mapa;
 
+// ############################# ONLINE ############################
+var nomJugador = "";
+var etiquetaNom;
+
 
 
 function preload() {
@@ -71,10 +75,10 @@ function create() {
     jugador = this.physics.add.sprite(300, 12000, 'jugador');
     jugador.setDepth(1);
     // jugador.setCollideWorldBounds(true);  // Evita que el jugador surti de la pantalla
-    jugador.setDrag(10, 0);  // Aplica fricció al moviment horitzontal per un efecte de relliscament
+    jugador.setDrag(10, 0);
     jugador.setMaxVelocity(1000, 1000);
     this.cameras.main.startFollow(jugador, false, 0.1, 0.1, 0, 50);
-    this.cameras.main.setBackgroundColor(0x87CEEB); // Blau cel
+    this.cameras.main.setBackgroundColor(0x87CEEB);
     this.cameras.main.setZoom(0.3);
 
     // Configura les tecles de moviment
@@ -94,9 +98,9 @@ function create() {
     }).setScrollFactor(0);
 
     //UI
-    textDebugar.setDepth(100); // Assegura que el text estigui al davant de tot
-    textDebugar.setVisible(false); // Oculta el text en iniciar
-    debugKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P); // `'` en teclats espanyols
+    textDebugar.setDepth(100);
+    textDebugar.setVisible(false);
+    debugKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
 
     let posXBarra = jugador.x - ampladaBarra / 2;
     let posYBarra = jugador.y - jugador.height - 30;
@@ -187,6 +191,25 @@ function create() {
     this.physics.add.overlap(jugador, aigua, dinsAigua, null, this);
     */
 
+    document.getElementById("botoComençar").onclick = () => {
+        nomJugador = document.getElementById("nomJugador").value.trim();
+        if (nomJugador.length === 0) return;
+    
+        document.getElementById("menu-nom").style.display = "none";
+    
+        etiquetaNom = game.scene.scenes[0].add.text(jugador.x, jugador.y - 60, nomJugador, {
+            fontSize: '40px',
+            fill: '#ffffff',
+            fontFamily: 'Arial',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            padding: { x: 8, y: 4 }
+        });
+        etiquetaNom.setOrigin(0.5);
+        etiquetaNom.setDepth(1000);
+
+        socket.emit("nomJugador", nomJugador);
+    };
+
     socket = io(); // Connecta amb el servidor
 
     altresJugadors = {};
@@ -198,20 +221,38 @@ function create() {
                     let sprite = game.scene.scenes[0].add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
                     sprite.setAlpha(0.8);
                     sprite.setDepth(0);
-                    altresJugadors[id] = sprite;
+    
+                    let etiqueta = game.scene.scenes[0].add.text(jugadors[id].x, jugadors[id].y - 80, jugadors[id].nom || "Jugador", {
+                        fontSize: '20px',
+                        fill: '#ffffff',
+                        fontFamily: 'Arial',
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        padding: { x: 6, y: 3 }
+                    });
+                    etiqueta.setOrigin(0.5);
+                    etiqueta.setDepth(1000);
+    
+                    altresJugadors[id] = {
+                        sprite: sprite,
+                        etiqueta: etiqueta
+                    };
                 } else {
-                    altresJugadors[id].setPosition(jugadors[id].x, jugadors[id].y);
+                    altresJugadors[id].sprite.setPosition(jugadors[id].x, jugadors[id].y);
+                    altresJugadors[id].etiqueta.setPosition(jugadors[id].x, jugadors[id].y - 80);
+                    altresJugadors[id].etiqueta.setText(jugadors[id].nom || "Jugador");
                 }
             }
         }
     
         for (let id in altresJugadors) {
             if (!jugadors[id]) {
-                altresJugadors[id].destroy();
+                altresJugadors[id].sprite.destroy();
+                altresJugadors[id].etiqueta.destroy();
                 delete altresJugadors[id];
             }
         }
     });
+    
     
 
     
@@ -239,22 +280,22 @@ function dinsAigua(tempsDelta) {
 
 
 function normalitzarVector(vector) {
-    // Calcular la norma (mòdul) del vector
+    
     let norma = Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
 
-    // Evitar la divisió per 0 en cas que el vector sigui el vector nul
+    
     if (norma === 0) {
         return [0, 0];
     }
 
-    // Normalitzar el vector dividint cada component per la norma
+    
     return [vector[0] / norma, vector[1] / norma];
 }
 
 function calculavecJugadorRatoli(scene)
 {
-    let mouseX = scene.input.activePointer.worldX; // Coordenada X real del ratolí en el món del joc
-    let mouseY = scene.input.activePointer.worldY; // Coordenada Y real del ratolí en el món del joc
+    let mouseX = scene.input.activePointer.worldX;
+    let mouseY = scene.input.activePointer.worldY;
     let deltaX = mouseX - jugador.x;
     let deltaY = mouseY - jugador.y;
     return [deltaX, deltaY];
@@ -282,7 +323,6 @@ function comprovaReduirCooldown(delta)
         resActual = resMax;
     }
 
-    // Mostrar la barra si estem clicant o si la resistència no és plena
     let visible = faClick || resActual < resMax;
     barraResistencia.setVisible(visible);
     fonsBarra.setVisible(visible);
@@ -293,7 +333,7 @@ function jugadorEstaEnAigua() {
     let hitboxJugador = new Phaser.Geom.Rectangle(jugador.x, jugador.y, jugador.width, jugador.height);
     let tilesAigua = capaAigua.getTilesWithinShape(hitboxJugador, { isNotEmpty: true });
 
-    return tilesAigua.length > 0; // Si hi ha alguna tile d'aigua, retorna true
+    return tilesAigua.length > 0;
 }
 
 function actualitzaBarraRes()
@@ -314,7 +354,6 @@ function actualitzaBarraRes()
         let percentatgePrevist = forçaPrevista / resMax;
         let ampladaPrevista = ampladaBarra * percentatgePrevist;
         
-        // Posicionar la barra prevista a l'esquerra de la barra actual
         barraResistenciaPrevista.width = ampladaPrevista;
         barraResistenciaPrevista.setPosition(posXBarra + novaAmplada - ampladaPrevista, posYBarra);
 
@@ -322,20 +361,18 @@ function actualitzaBarraRes()
     } else {
         barraResistenciaPrevista.setVisible(false);
     }
-
-    // Color canvia segons nivell de resistència
+    // canviar el color de la barra
     if (percentatge > 0.5) {
-        barraResistencia.fillColor = 0x00ff00; // verd
+        barraResistencia.fillColor = 0x00ff00; 
     } else if (percentatge > 0.25) {
-        barraResistencia.fillColor = 0xffff00; // groc
+        barraResistencia.fillColor = 0xffff00; 
     } else {
-        barraResistencia.fillColor = 0xff0000; // vermell
+        barraResistencia.fillColor = 0xff0000; 
     }
 }
 
 
 function update(time, delta) {
-    // Si estem mantenint el clic, actualitza la durada del clic
     if (faClick) {
         TempsFentClick += delta;
     }
@@ -384,8 +421,16 @@ function update(time, delta) {
         `resActual: ${resActual}`
     );
 
+    if (etiquetaNom) {
+        etiquetaNom.setPosition(jugador.x, jugador.y - jugador.height - 80);
+    }
+
     if (socket && socket.connected) {
-        socket.emit("update", { x: jugador.x, y: jugador.y });
+        socket.emit("update", {
+            x: jugador.x,
+            y: jugador.y,
+            nom: nomJugador
+        });
     }    
 }
 

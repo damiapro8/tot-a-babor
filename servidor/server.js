@@ -11,7 +11,6 @@ const io = socketIo(server, {
   }
 });
 
-// Serveix fitxers estàtics
 app.use(express.static(path.join(__dirname, "..")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../index.html"));
@@ -20,10 +19,22 @@ app.get("/", (req, res) => {
 let jugadors = {};
 
 io.on("connection", socket => {
-  jugadors[socket.id] = { x: 0, y: 0 };
+  jugadors[socket.id] = { x: 0, y: 0, nom: "Jugador" };
+
+  socket.on("nomJugador", nom => {
+    if (jugadors[socket.id]) {
+      jugadors[socket.id].nom = nom;
+    }
+  });
 
   socket.on("update", pos => {
-    jugadors[socket.id] = pos;
+    if (jugadors[socket.id]) {
+      jugadors[socket.id].x = pos.x;
+      jugadors[socket.id].y = pos.y;
+      if (pos.nom) {
+        jugadors[socket.id].nom = pos.nom;
+      }
+    }
     io.emit("state", jugadors);
   });
 
