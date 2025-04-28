@@ -218,9 +218,12 @@ function create() {
         for (let id in jugadors) {
             if (id !== socket.id) {
                 if (!altresJugadors[id]) {
-                    let sprite = game.scene.scenes[0].add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
+                    let sprite = game.scene.scenes[0].physics.add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
                     sprite.setAlpha(0.8);
                     sprite.setDepth(0);
+                    sprite.setImmovable(true); // Opcional: fa que no es moguin si xoquen
+                    game.scene.scenes[0].physics.add.collider(jugador, sprite);
+
     
                     let etiqueta = game.scene.scenes[0].add.text(jugadors[id].x, jugadors[id].y - 80, jugadors[id].nom || "Jugador", {
                         fontSize: '20px',
