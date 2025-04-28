@@ -49,6 +49,13 @@ var barraResistenciaPrevista;
 var ampladaBarra = 300;
 var alçadaBarra = 30;
 
+// ############################# Lootbox ##########################
+var fonsOpcio1;
+var posXLoot = 100;
+var posYLoot = 100;
+var ampladaLoot = 500;
+var alçadaLoot = 3000;
+
 // ############################# TILEMAP ###########################
 var capaAigua;
 var capaTerra;
@@ -121,8 +128,10 @@ function create() {
     barraResistencia.setDepth(1001);
     barraResistenciaPrevista.setDepth(1002);
 
-
-    
+    // UI lootbox
+    fonsOpcio1 = this.add.rectangle(posXBarra, posYBarra, ampladaBarra, alçadaBarra, 0x444444);
+    fonsOpcio1.setOrigin(0, 0);
+    fonsOpcio1.setVisible(false);
 
     // Quan es fa clic, guardar el temps d'inici del clic
     this.input.on('pointerdown', (pointer) => {
