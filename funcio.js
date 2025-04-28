@@ -219,6 +219,7 @@ function create() {
             if (id !== socket.id) {
                 if (!altresJugadors[id]) {
                     let sprite = game.scene.scenes[0].physics.add.sprite(jugadors[id].x, jugadors[id].y, 'jugador');
+                    sprite.body.allowGravity = false;
                     sprite.setAlpha(0.8);
                     sprite.setDepth(0);
                     sprite.setImmovable(true); // Opcional: fa que no es moguin si xoquen
