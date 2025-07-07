@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tot a Babor</title>
     <link rel="stylesheet" href="estil.css">
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/phaser-tiled@1.0.0/dist/phaser-tiled.min.js"></script> <!-- Inclou la versió correcta de phaser-tiled -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <script src="funcio.js"></script>
 </head>
 <body>
     <div id="game-container">
@@ -16,7 +14,8 @@
             <label for="nomJugador">Escriu el teu nom:</label>
             <input type="text" id="nomJugador" maxlength="12" />
             <button id="botoComençar">Començar</button>
-          </div>          
+        </div>          
     </div>
+    <script type="module" src="./src/main.js"></script>
 </body>
 </html>
