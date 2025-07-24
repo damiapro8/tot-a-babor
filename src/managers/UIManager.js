@@ -60,11 +60,6 @@ export class UIManager {
             this.createLootBox(x + width + padding, y, width, height, alpha),
             this.createLootBox(x + 2 * width + 2 * padding, y, width, height, alpha)
         ];
-
-        this.scene.input.keyboard.on('keydown-O', () => {
-            const visible = !this.lootBoxes[0].visible;
-            this.lootBoxes.forEach(box => box.setVisible(visible));
-        });
     }
 
     createLootBox(x, y, width, height, alpha) {

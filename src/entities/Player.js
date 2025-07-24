@@ -32,11 +32,11 @@ export class Player {
             max: 800,
             min: 0,
             clickTime: 0,
-            clickSpeed: 800 / 2000 // VelForçaClick
+            clickSpeed: 800 / 2000 
         };
 
         this.isClicking = false;
-        this.isInWater = false; // Aquesta és la propietat
+        this.isInWater = false; 
         this.canMove = true;
     }
 
@@ -44,7 +44,6 @@ export class Player {
         Physics.applyForce(this.sprite, vector, force);
     }
 
-    // Canvia el nom del mètode per evitar conflicte
     checkIfInWater() {
         const hitbox = new Phaser.Geom.Rectangle(
             this.sprite.x, 
@@ -52,8 +51,9 @@ export class Player {
             this.sprite.width, 
             this.sprite.height
         );
-        const waterTiles = this.scene.waterLayer.getTilesWithinShape(hitbox, { isNotEmpty: true });
-        return waterTiles.length > 0;
+        const tiles = this.scene.mainLayer.getTilesWithinShape(hitbox, { isNotEmpty: true });
+    
+        return tiles.some(tile => tile.properties.tipus === "aigua");
     }
 
     handleWater(delta) {
@@ -72,7 +72,6 @@ export class Player {
     }
 
     updateStamina(delta) {
-        // Utilitza el nou nom del mètode
         this.isInWater = this.checkIfInWater();
         
         const recoveryRate = this.isInWater ? 

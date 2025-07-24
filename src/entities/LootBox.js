@@ -60,7 +60,7 @@ export class Lootbox {
         
         // Pausar el joc
         this.scene.physics.pause();
-        this.scene.time.pause();
+        //this.scene.time.pause();
     }
     
     createSelectButton(x, y) {
@@ -103,7 +103,7 @@ export class Lootbox {
         
         // Reprendre el joc
         this.scene.physics.resume();
-        this.scene.time.resume();
+        //this.scene.time.resume();
     }
     
     getRandomUpgrades() {
