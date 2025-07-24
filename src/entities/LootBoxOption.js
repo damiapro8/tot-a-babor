@@ -5,7 +5,7 @@ export class LootboxOption {
         this.isSelected = false;
         
         // Fons amb bordes i ombra
-        this.background = scene.add.rectangle(x, y, width, height, 0x2d2d2d)
+        this.background = scene.add.rectangle(x, y, width, height, this.getColorForRarity(optionData.rarity))
             .setOrigin(0.5, 0)
             .setStrokeStyle(3, 0x555555)
             .setInteractive()
@@ -18,14 +18,22 @@ export class LootboxOption {
             .setOrigin(0.5, 0)
             .setAlpha(0)
             .setDepth(-1);
-        
+        // text de raresa
+        this.rarityText = scene.add.text(x, y + 10, optionData.rarity.toUpperCase(), {
+            fontSize: '40px',
+            fill: '#fffb00ff',
+            fontFamily: 'Arial',
+            align: 'center',
+            fontWeight: 'bold'
+        }).setOrigin(0.5, 0);
+
         // Icona representativa
-        this.icon = scene.add.text(x, y + 40, optionData.icon, {
+        this.icon = scene.add.text(x, y + 60, optionData.icon, {
             fontSize: '120px',
         }).setOrigin(0.5, 0);
         
         // Títol
-        this.title = scene.add.text(x, y + 170, optionData.title, {
+        this.title = scene.add.text(x, y + 190, optionData.title, {
             fontSize: '50px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -34,7 +42,7 @@ export class LootboxOption {
         }).setOrigin(0.5, 0);
         
         // Descripció
-        this.description = scene.add.text(x, y + 250, optionData.description, {
+        this.description = scene.add.text(x, y + 270, optionData.description, {
             fontSize: '40px',
             fill: '#CCCCCC',
             fontFamily: 'Arial',
@@ -43,15 +51,15 @@ export class LootboxOption {
             lineSpacing: 10
         }).setOrigin(0.5, 0);
     }
-    
+
     getColorForRarity() {
-        switch(this.optionData.effect.type) {
-            case 'common': return '#a0a0a0';
-            case 'unusual': return '#ff4e4e';
-            case 'rare': return '#4e8cff';
-            case 'epic': return '#a64eff';
-            case 'legendary': return '#ff9a00';
-            default: return '#FFFFFF';
+        switch(this.optionData.rarity) {
+            case 'comú': return 0x525151;
+            case 'inusual': return 0x1f6c1b;
+            case 'rar': return 0x294c8d;
+            case 'èpic': return 0x502a77;
+            case 'llegendari': return 0x8f7f00;
+            default: return 0xffffff;
         }
     }
     
@@ -61,7 +69,7 @@ export class LootboxOption {
     }
     
     resetAppearance() {
-        this.background.setFillStyle(0x2d2d2d);
+        this.background.setFillStyle(this.getColorForRarity(this.optionData.rarity));
         this.selectionGlow.setAlpha(0);
     }
     
@@ -90,36 +98,42 @@ export class LootboxOption {
         if (!this.isSelected) return;
         
         // Aplicar efecte al jugador
-        switch(this.optionData.effect.type) {
-            case 'increaseSpeed':
-                this.scene.player.movement.speed *= this.optionData.effect.value;
-                this.scene.player.movement.maxSpeed = Math.floor(this.scene.player.movement.maxSpeed * this.optionData.effect.value);
-                break;
-            case 'increaseStamina':
-                this.scene.player.stamina.max = Math.floor(this.scene.player.stamina.max * this.optionData.effect.value);
-                this.scene.player.stamina.current = Math.min(
-                    this.scene.player.stamina.current, 
-                    this.scene.player.stamina.max
-                );
-                break;
-            case 'reduceClickCooldown':
-                this.scene.player.force.clickSpeed *= this.optionData.effect.value;
-                break;
-            case 'increaseWaterRecovery':
-                this.scene.player.stamina.waterRecovery *= this.optionData.effect.value;
-                break;
-            case 'increaseAirRecovery':
-                this.scene.player.stamina.airRecovery *= this.optionData.effect.value;
-                break;
-            case 'increaseForce':
-                this.scene.player.force.max = Math.floor(this.scene.player.force.max * this.optionData.effect.value);
-                this.scene.player.force.clickSpeed = this.scene.player.force.max / 2000; // VelForçaClick
-                break;
-            case 'smallerPlayer':
-                this.scene.player.sprite.width *= this.optionData.effect.value;
-                this.scene.player.sprite.height *= this.optionData.effect.value;
-                this.scene.player.sprite.setScale(this.scene.player.sprite.scaleX * this.optionData.effect.value);
-        }
+        this.optionData.effects.forEach(effect => {
+            switch(effect.type) {
+                case 'increaseSpeed':
+                    this.scene.player.movement.speed *= effect.value;
+                    this.scene.player.movement.maxSpeed = Math.floor(this.scene.player.movement.maxSpeed * effect.value);
+                    break;
+                case 'increaseStamina':
+                    this.scene.player.stamina.max = Math.floor(this.scene.player.stamina.max * effect.value);
+                    this.scene.player.stamina.current = Math.min(
+                        this.scene.player.stamina.current, 
+                        this.scene.player.stamina.max
+                    );
+                    break;
+                case 'reduceClickCooldown':
+                    this.scene.player.force.clickSpeed *= effect.value;
+                    break;
+                case 'increaseWaterRecovery':
+                    this.scene.player.stamina.waterRecovery *= effect.value;
+                    break;
+                case 'increaseAirRecovery':
+                    this.scene.player.stamina.airRecovery *= effect.value;
+                    break;
+                case 'increaseForce':
+                    this.scene.player.force.max = Math.floor(this.scene.player.force.max * effect.value);
+                    this.scene.player.force.clickSpeed = this.scene.player.force.max / 2000;
+                    break;
+                case 'scalePlayer':
+                    this.scene.player.sprite.width *= effect.value;
+                    this.scene.player.sprite.height *= effect.value;
+                    this.scene.player.sprite.setScale(this.scene.player.sprite.scaleX * effect.value);
+                    break;
+                case 'increasePlayerWheight':
+                    this.scene.physics.world.gravity.y *= effect.value; // Ajusta la gravetat global
+                    break;
+            }
+        });
     }
     
     destroy() {
@@ -128,5 +142,6 @@ export class LootboxOption {
         this.icon.destroy();
         this.title.destroy();
         this.description.destroy();
+        this.rarityText.destroy();
     }
 }

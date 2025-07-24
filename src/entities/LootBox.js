@@ -25,7 +25,7 @@ export class Lootbox {
         )
         .setOrigin(0.5, 0.5)
         .setScrollFactor(0)
-        .setDepth(999)
+        .setDepth(1005)
         .setInteractive();
         
         // Configuració de la lootbox (80% de l'amplada de pantalla)
@@ -48,10 +48,11 @@ export class Lootbox {
                 optionHeight,
                 optionsData[i]
             );
-            option.background.setScrollFactor(0).setDepth(1000);
-            option.title.setScrollFactor(0).setDepth(1001);
-            option.description.setScrollFactor(0).setDepth(1001);
-            option.icon.setScrollFactor(0).setDepth(1001);
+            option.background.setScrollFactor(0).setDepth(1009);
+            option.title.setScrollFactor(0).setDepth(1010);
+            option.description.setScrollFactor(0).setDepth(1010);
+            option.icon.setScrollFactor(0).setDepth(1010);
+            option.rarityText.setScrollFactor(0).setDepth(1010);
             this.options.push(option);
         }
         
@@ -74,7 +75,7 @@ export class Lootbox {
         })
         .setOrigin(0.5)
         .setScrollFactor(0)
-        .setDepth(1001)
+        .setDepth(1010)
         .setInteractive()
         .on('pointerover', () => this.selectButton.setBackgroundColor('#5a5a9f'))
         .on('pointerout', () => this.selectButton.setBackgroundColor('#4a4a8f'))
@@ -109,48 +110,77 @@ export class Lootbox {
     getRandomUpgrades() {
         const possibleUpgrades = [
             {
-            title: "VELOCITAT MILLORADA",
-            description: "Augmenta la velocitat de moviment amb A i D\nun 25%",
-            effect: { type: 'increaseSpeed', value: 1.25 },
-            icon: '🏃‍♂️'
+                title: "MILLOR MANIOBRABILITAT",
+                description: "més facil girar el vaixell",
+                effects: [{ type: 'increaseSpeed', value: 1.25 }],
+                icon: '🚤',
+                rarity: 'comú'
             },
             {
-            title: "RESISTÈNCIA MÀXIMA",
-            description: "Augmenta la teva resistència\nmàxima en un 30%",
-            effect: { type: 'increaseStamina', value: 1.3 },
-            icon: '❤️'
+                title: "MILLOR RESISTÈNCIA",
+                description: "Augmenta la teva resistència màxima",
+                effects: [{ type: 'increaseStamina', value: 1.25 }],
+                icon: '❤️',
+                rarity: 'comú'
             },
             {
-            title: "RECUPERACIÓ RÀPIDA",
-            description: "Vas un 20% més ràpid per\narrivar a maxima força",
-            effect: { type: 'reduceClickCooldown', value: 1.2 },
-            icon: '⏱️💪'
+                title: "RECUPERACIÓ RÀPIDA",
+                description: "Vas més ràpid en arrivar a maxima força",
+                effects: [{ type: 'reduceClickCooldown', value: 1.2 }],
+                icon: '⏱️💪',
+                rarity: 'inusual'
             },
             {
-            title: "RECUPERACIÓ D'AIGUA",
-            description: "Augmenta la recuperació de resistencia en aigua\nun 30%",
-            effect: { type: 'increaseWaterRecovery', value: 1.3 },
-            icon: '⏱️💧'
+                title: "RECUPERACIÓ D'AIGUA",
+                description: "Augmenta la recuperació de resistencia en aigua",
+                effects: [{ type: 'increaseWaterRecovery', value: 1.30 }],
+                icon: '⏱️💧',
+                rarity: 'comú'
             },
             {
-            title: "RECUPERACIÓ D'AIRE",
-            description: "Augmenta la recuperació de resistencia en aire\nun 30%",
-            effect: { type: 'increaseAirRecovery', value: 1.3 },
-            icon: '⏱️🌬️'
+                title: "RECUPERACIÓ D'AIRE",
+                description: "Augmenta la recuperació de resistencia en aire",
+                effects: [{ type: 'increaseAirRecovery', value: 1.30 }],
+                icon: '⏱️🌬️',
+                rarity: 'inusual'
             },
             {
-            title: "FORÇA MILLORADA",
-            description: "Augmenta la força màxima\nun 20%",
-            effect: { type: 'increaseForce', value: 1.2 },
-            icon: '💪'
+                title: "FORÇA MILLORADA",
+                description: "Augmenta la força màxima",
+                effects: [{ type: 'increaseForce', value: 1.2 }],
+                icon: '💪',
+                rarity: 'inusual'
             },
             {
-            title: "JUGADOR MÉS PETIT",
-            description: "Disminueix la mida del jugador\nun 20%",
-            effect: { type: 'smallerPlayer', value: 0.8 },
-            icon: '🤏'
+                title: "MÉS PETIT MES HABIL",
+                description: "Més petit\n millors maniobres",
+                effects: [{ type: 'scalePlayer', value: 0.8 },
+                        { type: 'increaseSpeed', value: 1.2 }
+                ],
+                icon: '🤏',
+                rarity: 'rar'
             },
-
+            {
+                title: "MÉS GRAN MES FORT",
+                description: "Més gran\n Més fort \n Més resistent\n Més pesat",
+                effects: [
+                    { type: 'increaseForce', value: 1.2 },
+                    { type: 'increaseStamina', value: 1.2 },
+                    { type: 'scalePlayer', value: 1.2 },
+                    { type: 'increasePlayerWheight', value: 1.1 }
+                ],
+                icon: '🦍',
+                rarity: 'rar'
+            },
+            {
+                title: "ENTRENAMENT DE AIRE",
+                description: "millor recuperacio en aire\n Lleuger com l'aire",
+                effects: [{ type: 'increaseAirRecovery', value: 1.2 },
+                        { type: 'increasePlayerWheight', value: 0.9 }
+                ],
+                icon: '🌬️',
+                rarity: 'èpic'
+            },
         ];
         
         return Phaser.Utils.Array.Shuffle([...possibleUpgrades]).slice(0, 3);
