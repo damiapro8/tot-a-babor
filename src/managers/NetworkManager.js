@@ -19,7 +19,7 @@ export class NetworkManager {
         for (let id in players) {
             if (id !== this.socket.id) {
                 if (!this.otherPlayers[id]) {
-                    this.createOtherPlayer(players[id]);
+                    this.createOtherPlayer(id, players[id]);
                 } else {
                     this.updateOtherPlayer(id, players[id]);
                 }
@@ -34,7 +34,7 @@ export class NetworkManager {
         }
     }
 
-    createOtherPlayer(playerData) {
+    createOtherPlayer(id, playerData) {
         const sprite = this.scene.physics.add.sprite(playerData.x, playerData.y, 'jugador');
         sprite.body.allowGravity = false;
         sprite.setAlpha(0.8);
