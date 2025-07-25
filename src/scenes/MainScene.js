@@ -21,13 +21,13 @@ export class MainScene extends Phaser.Scene {
         // Inicialitzar el jugador
         this.player = new Player(this, 550, 22000);
         
-        this.lootbox = new Lootbox(this, this.player);
+        // this.lootbox = new Lootbox(this, this.player);
         
-        // Configura la tecla per obrir la lootbox (per exemple, 'L')
-        this.input.keyboard.on('keydown-L', () => {
-            const upgrades = this.lootbox.getRandomUpgrades();
-            this.lootbox.show(upgrades);
-        });
+        // // Configura la tecla per obrir la lootbox (per exemple, 'L')
+        // this.input.keyboard.on('keydown-L', () => {
+        //     const upgrades = this.lootbox.getRandomUpgrades();
+        //     this.lootbox.show(upgrades);
+        // });
         
         // Configurar la càmera
         this.cameras.main.startFollow(this.player.sprite, false, 0.1, 0.1, 0, 50);
@@ -80,6 +80,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     agafaLootbox(cofre) {
+        this.inputManager.disableInput();
         cofre.setData('obert', true);
         this.lootbox = new Lootbox(this, this.player);
         const upgrades = this.lootbox.getRandomUpgrades();

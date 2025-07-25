@@ -106,10 +106,6 @@ export class LootboxOption {
                     break;
                 case 'increaseStamina':
                     this.scene.player.stamina.max = Math.floor(this.scene.player.stamina.max * effect.value);
-                    this.scene.player.stamina.current = Math.min(
-                        this.scene.player.stamina.current, 
-                        this.scene.player.stamina.max
-                    );
                     break;
                 case 'reduceClickCooldown':
                     this.scene.player.force.clickSpeed *= effect.value;
@@ -122,7 +118,6 @@ export class LootboxOption {
                     break;
                 case 'increaseForce':
                     this.scene.player.force.max = Math.floor(this.scene.player.force.max * effect.value);
-                    this.scene.player.force.clickSpeed = this.scene.player.force.max / 2000;
                     break;
                 case 'scalePlayer':
                     this.scene.player.sprite.width *= effect.value;

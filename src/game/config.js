@@ -10,5 +10,7 @@ export const GameConfig = {
             debug: false
         }
     },
-    scene: []
+    scene: [],
+    pixelArt: true,
+    roundPixels: true
 };

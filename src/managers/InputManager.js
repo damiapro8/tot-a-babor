@@ -4,6 +4,7 @@ export class InputManager {
     constructor(scene, player) {
         this.scene = scene;
         this.player = player;
+        this.inputEnabled = false; // Desactivat per defecte
         this.initKeyboardInput();
         this.initMouseInput();
     }
@@ -13,17 +14,26 @@ export class InputManager {
             left: Phaser.Input.Keyboard.KeyCodes.A,
             right: Phaser.Input.Keyboard.KeyCodes.D,
         });
+        
+        // Desactivar l'escolta d'events del teclat global
+        this.scene.input.keyboard.enabled = false;
     }
 
     initMouseInput() {
-        this.scene.input.on('pointerdown', (pointer) => {
+        this.scene.input.mouse.disableContextMenu();
+        
+        this.pointerDownHandler = (pointer) => {
+            if (!this.inputEnabled) return;
+            
             if (pointer.leftButtonDown() && !this.player.isClicking) {
                 this.player.isClicking = true;
                 this.player.force.clickTime = 0;
             }
-        });
-
-        this.scene.input.on('pointerup', (pointer) => {
+        };
+        
+        this.pointerUpHandler = (pointer) => {
+            if (!this.inputEnabled) return;
+            
             if (pointer.leftButtonReleased() && this.player.isClicking) {
                 this.player.isClicking = false;
                 
@@ -38,11 +48,14 @@ export class InputManager {
                 this.player.stamina.current -= force;
                 this.player.force.clickTime = 0;
             }
-        });
+        };
+        
+        this.scene.input.on('pointerdown', this.pointerDownHandler);
+        this.scene.input.on('pointerup', this.pointerUpHandler);
     }
 
     update() {
-        if (!this.player.canMove) return;
+        if (!this.player.canMove || !this.inputEnabled) return;
 
         // Moviment horitzontal
         if (this.cursors.left.isDown) {
@@ -63,5 +76,20 @@ export class InputManager {
         } else {
             this.player.sprite.setDrag(100, 0);
         }
+    }
+
+    enableInput() {
+        this.inputEnabled = true;
+        this.scene.input.keyboard.enabled = true;
+    }
+
+    disableInput() {
+        this.inputEnabled = false;
+        this.scene.input.keyboard.enabled = false;
+    }
+    
+    destroy() {
+        this.scene.input.off('pointerdown', this.pointerDownHandler);
+        this.scene.input.off('pointerup', this.pointerUpHandler);
     }
 }

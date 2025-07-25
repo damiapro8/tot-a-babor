@@ -104,6 +104,7 @@ export class Lootbox {
         
         // Reprendre el joc
         this.scene.physics.resume();
+        this.scene.inputManager.enableInput();
         //this.scene.time.resume();
     }
     
@@ -111,7 +112,7 @@ export class Lootbox {
         const possibleUpgrades = [
             {
                 title: "MILLOR MANIOBRABILITAT",
-                description: "més facil girar el vaixell",
+                description: "Més facil girar el vaixell",
                 effects: [{ type: 'increaseSpeed', value: 1.25 }],
                 icon: '🚤',
                 rarity: 'comú'
@@ -153,7 +154,7 @@ export class Lootbox {
             },
             {
                 title: "MÉS PETIT MES HABIL",
-                description: "Més petit\n millors maniobres\n més lleuger \n lleugerament més fluix\n lleugerament menys resistent",
+                description: "Més petit\n Millors maniobres\n Més lleuger \n Lleugerament més fluix\n Lleugerament menys resistent",
                 effects: [{ type: 'scalePlayer', value: 0.8 },
                         { type: 'increaseSpeed', value: 1.2 },
                         { type: 'increasePlayerWheight', value: 0.9 },
@@ -165,7 +166,7 @@ export class Lootbox {
             },
             {
                 title: "MÉS GRAN MES FORT",
-                description: "Més gran\n Més fort \n Més resistent\n Més pesat\n lleugerament menys agil",
+                description: "Més gran\n Més fort \n Més resistent\n Més pesat\n Lleugerament menys agil",
                 effects: [
                     { type: 'increaseForce', value: 1.2 },
                     { type: 'increaseStamina', value: 1.2 },
@@ -178,7 +179,7 @@ export class Lootbox {
             },
             {
                 title: "ENTRENAMENT DE AIRE",
-                description: "millor recuperacio en aire\n Lleuger com l'aire\n Menys força maxima",
+                description: "Millor recuperacio en aire\n Lleuger com l'aire\n Menys força maxima",
                 effects: [{ type: 'increaseAirRecovery', value: 1.2 },
                         { type: 'increasePlayerWheight', value: 0.9 },
                         { type: 'increaseForce', value: 0.9 }
@@ -188,7 +189,7 @@ export class Lootbox {
             },
             {
                 title: "ENTRENAMENT DE AIGUA",
-                description: "millor recuperacio en aigua\n Fluid com un riu",
+                description: "Millor recuperacio en aigua\n Fluid com un riu",
                 effects: [{ type: 'increaseWaterRecovery', value: 1.2 },
                         { type: 'increasePlayerSpeed', value: 1.2}
                 ],
@@ -197,7 +198,7 @@ export class Lootbox {
             },
             {
                 title: "ETRENAMENT DE TERRA",
-                description: "Mes fort\n Mes resistent\n Mes pesat\n pitjor recuperació",
+                description: "Mes fort\n Mes resistent\n Mes pesat\n Pitjor recuperació",
                 effects: [{ type: 'increaseForce', value: 1.2 },
                         { type: 'increaseStamina', value: 1.2 },
                         { type: 'increasePlayerWheight', value: 1.2 },
@@ -209,7 +210,7 @@ export class Lootbox {
             },
             {
                 title: "ENTRENAMENT DE FOC",
-                description: "més rapid\n més concentrat\n pitjor recuperació",
+                description: "Més rapid\n Més concentrat\n Pitjor recuperació",
                 effects: [
                     { type: 'increaseSpeed', value: 1.2 },
                     { type: 'reduceClickCooldown', value: 1.2 },
@@ -218,6 +219,41 @@ export class Lootbox {
                 ],
                 icon: '🔥',
                 rarity: 'èpic'
+            },
+            {
+                title: "MESTRE DE LA PUNTERIA",
+                description: "Molt més fort\n Molt més conentrat\n Molt més resistent\n No pots girar",
+                effects: [
+                    { type: 'increaseForce', value: 1.5 },
+                    { type: 'reduceClickCooldown', value: 1.5 },
+                    { type: 'increaseStamina', value: 1.5},
+                    { type: 'increaseSpeed', value: 0.0 },
+                ],
+                icon: '🎯',
+                rarity: 'èpic'
+            },
+            {
+                title: "GRAN MILLORA",
+                description: "Millora lleugerament tots els aspectes del vaixell",
+                effects: [
+                    { type: 'increaseSpeed', value: 1.1 },
+                    { type: 'increaseStamina', value: 1.1 },
+                    { type: 'reduceClickCooldown', value: 1.1 },
+                    { type: 'increaseForce', value: 1.1 },
+                    { type: 'increaseWaterRecovery', value: 1.1 },
+                    { type: 'increaseAirRecovery', value: 1.1 }
+                ],
+                icon: '🚀',
+                rarity: 'llegendari'
+            },
+            {
+                title: "MAXIMA POTENCIA",
+                description: "millora la concentracio al màxim",
+                effects: [
+                    { type: 'reduceClickCooldown', value: 10.0 }
+                ],
+                icon: '⚡',
+                rarity: 'llegendari'
             }
         ];
         
