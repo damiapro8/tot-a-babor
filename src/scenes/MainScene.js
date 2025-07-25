@@ -60,7 +60,7 @@ export class MainScene extends Phaser.Scene {
         const cofres = this.physics.add.staticGroup();
         this.map.getObjectLayer('Cofres').objects.forEach(obj => {
             const cofre = cofres.create(obj.x, obj.y, 'cofre'); // Assegura't que tens la imatge 'lootbox' carregada
-            cofre.setOrigin(0, 1); // Ajusta segons l'origen dels teus objectes
+            cofre.setOrigin(0.5, 1); // Ajusta segons l'origen dels teus objectes
         });
         this.cofres = cofres;
 

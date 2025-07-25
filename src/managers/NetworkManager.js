@@ -39,12 +39,8 @@ export class NetworkManager {
         sprite.body.allowGravity = false;
         sprite.setAlpha(0.8);
         sprite.setDepth(0);
-        //sprite.setImmovable(true);
+        sprite.setImmovable(true);
         this.scene.physics.add.collider(this.player.sprite, sprite);
-
-        for (let otherId in this.otherPlayers) {
-            this.scene.physics.add.collider(sprite, this.otherPlayers[otherId].sprite);
-        }
 
         const label = this.scene.add.text(
             playerData.x, 
