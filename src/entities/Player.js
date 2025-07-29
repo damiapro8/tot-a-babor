@@ -28,11 +28,22 @@ export class Player {
             airRecovery: 0.05
         };
 
+        this.health = {
+            current: 100,
+            max: 100,
+            restedRegen: 9,
+            groundDamage: 10,
+            lavaDamage: 40,
+            regeneration: 3
+        };
+
         this.force = {
             max: 800,
             min: 0,
             clickTime: 0,
-            clickSpeed: 800 / 2000 
+            clickSpeed: 800 / 2000, // 800 units in 2 seconds
+            downHandicap: 0.2,
+            downangle: 45
         };
 
         this.isClicking = false;
@@ -40,8 +51,39 @@ export class Player {
         this.canMove = true;
     }
 
+    esAngleAvall(angleGraus) {
+        // Normalitzem l'angle a positiu (0-360)
+        const anglePositiu = angleGraus < 0 ? angleGraus + 360 : angleGraus;
+        // Marge de +/- downangle al voltant de 180º (cap avall)
+        return Math.abs(anglePositiu - 90) < this.force.downangle;
+    }
+
     applyForce(vector, force) {
         Physics.applyForce(this.sprite, vector, force);
+    }
+
+    checkIfInLava() {
+        const hitbox = new Phaser.Geom.Rectangle(
+            this.sprite.x,
+            this.sprite.y,
+            this.sprite.width,
+            this.sprite.height
+        );
+        const tiles = this.scene.mainLayer.getTilesWithinShape(hitbox, { isNotEmpty: true });
+        return tiles.some(tile => tile.properties.tipus === "lava");
+    }
+
+    handleLavaDamage(delta) {
+        if (this.checkIfInLava()) {
+            const damage = this.health.lavaDamage * delta / 1000;
+            this.health.current -= damage;
+
+            if (this.health.current <= 0) {
+                this.sprite.setPosition(this.scene.spawnPoint.x, this.scene.spawnPoint.y);
+                this.health.current = this.health.max;
+                this.stamina.current = this.stamina.max;
+            }
+        }
     }
 
     checkIfInWater() {
@@ -52,8 +94,7 @@ export class Player {
             this.sprite.height
         );
         const tiles = this.scene.mainLayer.getTilesWithinShape(hitbox, { isNotEmpty: true });
-    
-        return tiles.some(tile => tile.properties.tipus === "aigua");
+        return tiles.some(tile => tile.properties.tipus === "aigua" || tile.properties.tipus === "lava");
     }
 
     handleWater(delta) {
@@ -81,6 +122,35 @@ export class Player {
         this.stamina.current += recoveryRate * delta;
         this.stamina.current = Math.min(this.stamina.current, this.stamina.max);
     }
+    // Recupera més ràpid si la stamina és al màxim
+    recoverHealth(delta) {
+        if (this.scene.inputManager.inputEnabled) {
+            let recoveryRate;
+            if (this.stamina.current >= this.stamina.max) {
+                recoveryRate = this.health.restedRegen * delta / 1000;
+            } else {
+                recoveryRate = this.health.regeneration * delta / 1000;
+            }
+            this.health.current += recoveryRate;
+            this.health.current = Math.min(this.health.current, this.health.max);
+        }
+    }
+
+    checkGroundDamage(delta) {
+        // Check if the sprite is touching down (colliding with ground)
+        if (this.sprite.body.blocked.down && !this.isInWater) {
+            if (this.scene.inputManager.inputEnabled) {
+                const damage = this.health.groundDamage * delta / 1000;
+                this.health.current -= damage;
+
+                if (this.health.current <= 0) {
+                    this.sprite.setPosition(this.scene.spawnPoint.x, this.scene.spawnPoint.y);
+                    this.health.current = this.health.max;
+                    this.stamina.current = this.stamina.max;
+                }
+            }
+        }
+    }
 
     update(delta) {
         this.updateStamina(delta);
@@ -89,10 +159,15 @@ export class Player {
             this.force.clickTime += delta;
         }
 
+        this.handleLavaDamage(delta);
         if (this.isInWater) {
             this.handleWater(delta);
         }
+        
+        this.recoverHealth(delta);
+        this.checkGroundDamage(delta);
 
+        
         this.canMove = this.isInWater;
     }
 }

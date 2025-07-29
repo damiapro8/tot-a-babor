@@ -6,6 +6,7 @@ export class UIManager {
         this.initDebugText();
         this.initLootBox();
         this.initNameInput();
+        this.initHealthBar();
     }
 
     initStaminaBar() {
@@ -29,6 +30,23 @@ export class UIManager {
             .setScrollFactor(1)
             .setDepth(1002)
             .setVisible(false);
+    }
+
+    initHealthBar() {
+        const width = 300;
+        const height = 30;
+        const x = this.player.sprite.x - width / 2;
+        const y = this.player.sprite.y - this.player.sprite.height - 70;
+
+        this.healthBarBg = this.scene.add.rectangle(x, y, width, height, 0x444444)
+            .setOrigin(0, 0)
+            .setScrollFactor(1)
+            .setDepth(1000);
+        
+        this.healthBar = this.scene.add.rectangle(x, y, width, height, 0xff0000)
+            .setOrigin(0, 0)
+            .setScrollFactor(1)
+            .setDepth(1001);
     }
 
     initDebugText() {
@@ -89,7 +107,7 @@ export class UIManager {
     createNameLabel(name) {
         this.nameLabel = this.scene.add.text(
             this.player.sprite.x, 
-            this.player.sprite.y - 60, 
+            this.player.sprite.y - 100, 
             name, 
             {
                 fontSize: '40px',
@@ -106,6 +124,7 @@ export class UIManager {
         this.updateStaminaBar();
         this.updateDebugText();
         this.updateNameLabel();
+        this.updateHealthBar();
     }
 
     updateStaminaBar() {
@@ -148,6 +167,24 @@ export class UIManager {
         this.staminaBarBg.setVisible(visible);
     }
 
+    updateHealthBar() {
+        const x = this.player.sprite.x - this.healthBarBg.width / 2;
+        const y = this.player.sprite.y - this.player.sprite.height - 70;
+        this.healthBarBg.setPosition(x, y);
+        this.healthBar.setPosition(x, y);
+        const healthPercent = this.player.health.current / this.player.health.max;
+        const newWidth = this.healthBarBg.width * healthPercent;
+        this.healthBar.width = newWidth;
+
+        if (this.player.health.current < this.player.health.max) {
+            this.healthBar.setVisible(true);
+            this.healthBarBg.setVisible(true);
+        } else {
+            this.healthBar.setVisible(false);
+            this.healthBarBg.setVisible(false);
+        }
+    }
+
     updateDebugText() {
         if (this.debugText.visible) {
             this.debugText.setText(
@@ -155,7 +192,8 @@ export class UIManager {
                 `VelY: ${this.player.sprite.body.velocity.y.toFixed(2)}\n` +
                 `Temps Click: ${this.player.force.clickTime.toFixed(2)} ms\n` +
                 `resMax: ${this.player.stamina.max}\n` +
-                `resActual: ${this.player.stamina.current}`
+                `resActual: ${this.player.stamina.current}\n` +
+                `vida: ${this.player.health.current.toFixed(2)}\n`
             );
         }
     }
@@ -164,7 +202,7 @@ export class UIManager {
         if (this.nameLabel) {
             this.nameLabel.setPosition(
                 this.player.sprite.x, 
-                this.player.sprite.y - this.player.sprite.height - 80
+                this.player.sprite.y - this.player.sprite.height - 100
             );
         }
     }

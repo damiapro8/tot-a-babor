@@ -36,13 +36,23 @@ export class InputManager {
             
             if (pointer.leftButtonReleased() && this.player.isClicking) {
                 this.player.isClicking = false;
+
                 
-                const force = Math.min(
+                
+                let force = Math.min(
                     Math.max(this.player.force.clickTime * this.player.force.clickSpeed, this.player.force.min),
                     Math.min(this.player.force.max, this.player.stamina.current)
                 );
                 
                 const direction = Physics.calculateMouseDirection(this.scene, this.player.sprite);
+
+                //miro si l'angle és cap avall
+                const angle = Physics.calculateMouseAngle(this.scene, this.player.sprite);
+
+                if (this.player.esAngleAvall(angle)) {
+                    force *= this.player.force.downHandicap;
+                }
+
                 this.player.applyForce(direction, force);
                 
                 this.player.stamina.current -= force;

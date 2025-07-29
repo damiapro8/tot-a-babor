@@ -15,11 +15,13 @@ export class MainScene extends Phaser.Scene {
         this.load.image('caselles', '../../imatges/tileset_boig.png');
         this.load.image('fons', '../../imatges/tileset_boig_fons.png');
         this.load.image('cofre', '../../imatges/cofre.png');
+        this.load.image('casellesExtra', '../../imatges/tileset_boig2.png');
     }
 
     create() {
         // Inicialitzar el jugador
-        this.player = new Player(this, 550, 22000);
+        this.spawnPoint = { x: 550, y: 22000 };
+        this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
         
         // this.lootbox = new Lootbox(this, this.player);
         
@@ -52,15 +54,24 @@ export class MainScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: 'mapa', tileWidth: 64, tileHeight: 64 });
         let tileset1 = this.map.addTilesetImage('tileset_boig', 'caselles');
         let tileset2 = this.map.addTilesetImage('tileset_boig_fons', 'fons'); 
-        // Crear grup de cofres a partir de la capa 'Cofres'
+        let tileset3 = this.map.addTilesetImage('tileset_boig2', 'casellesExtra');
         
-        let combinedTilesets = [tileset1, tileset2];
+        let combinedTilesets = [tileset1, tileset2, tileset3];
         this.mainLayer = this.map.createLayer('Capa1', combinedTilesets, 0, 0);
-        
+
+        this.mainLayer.forEachTile(tile => {
+            if (tile.properties.tipus === 'vidre') {
+                const tileSprite = this.mainLayer.getTileAt(tile.x, tile.y);
+                if (tileSprite) {
+                    tileSprite.alpha = 0.2; // Set transparency to 50%
+                }
+            }
+        });
+
         const cofres = this.physics.add.staticGroup();
         this.map.getObjectLayer('Cofres').objects.forEach(obj => {
-            const cofre = cofres.create(obj.x, obj.y, 'cofre'); // Assegura't que tens la imatge 'lootbox' carregada
-            cofre.setOrigin(0.5, 1); // Ajusta segons l'origen dels teus objectes
+            const cofre = cofres.create(obj.x, obj.y, 'cofre'); 
+            cofre.setOrigin(0.5, 1); 
         });
         this.cofres = cofres;
 

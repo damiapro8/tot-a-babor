@@ -15,4 +15,12 @@ export class Physics {
         sprite.setVelocityX(sprite.body.velocity.x + normalizedVector[0] * force);
         sprite.setVelocityY(sprite.body.velocity.y + normalizedVector[1] * force);
     }
+
+    static calculateMouseAngle(scene, sprite) {
+        const punter = scene.input.activePointer;
+        return Phaser.Math.Angle.Between(
+            sprite.x, sprite.y,
+            punter.worldX, punter.worldY
+        ) * Phaser.Math.RAD_TO_DEG;
+    }
 }
