@@ -3,7 +3,7 @@ import { UIManager } from '../managers/UIManager.js';
 import { InputManager } from '../managers/InputManager.js';
 import { NetworkManager } from '../managers/NetworkManager.js';
 import { Lootbox } from '../entities/LootBox.js';
-import { esDispositiuMobil  } from '../utils/altres.js';
+import { esDispositiuMobil } from '../utils/altres.js';
 
 export class MainScene extends Phaser.Scene {
     constructor() {
@@ -20,27 +20,17 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
-        //coses de mobil
-        this.comprovarOrientacio();
-        window.addEventListener('orientationchange', this.comprovarOrientacio.bind(this));
-        window.addEventListener('resize', this.comprovarOrientacio.bind(this));
         // Inicialitzar el jugador
         this.spawnPoint = { x: 550, y: 22000 };
-        //this.spawnPoint = { x: 15000, y: 1000 };
         this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
-        
-        // this.lootbox = new Lootbox(this, this.player);
-        
-        // // Configura la tecla per obrir la lootbox (per exemple, 'L')
-        // this.input.keyboard.on('keydown-L', () => {
-        //     const upgrades = this.lootbox.getRandomUpgrades();
-        //     this.lootbox.show(upgrades);
-        // });
         
         // Configurar la càmera
         this.cameras.main.startFollow(this.player.sprite, false, 0.1, 0.1, 0, 50);
         this.cameras.main.setBackgroundColor(0x87CEEB);
-        this.cameras.main.setZoom(0.3);
+        
+        // Ajustar zoom segons dispositiu
+        const zoomInicial = esDispositiuMobil() ? 0.6 : 0.3;
+        this.cameras.main.setZoom(zoomInicial);
 
         // Inicialitzar managers
         this.uiManager = new UIManager(this, this.player);
@@ -50,50 +40,19 @@ export class MainScene extends Phaser.Scene {
         // Carregar el mapa
         this.createMap();
 
-        
+        // Configuració responsive per a mòbils
+        if (esDispositiuMobil()) {
+            this.scale.on('resize', this.ajustarZoomMobil, this);
+            this.ajustarZoomMobil();
+        }
     }
 
-    comprovarOrientacio() {
-    if (esDispositiuMobil()) {
-        const angle = Math.abs(window.orientation);
-        const esHoritzontal = angle === 90 || angle === 270;
+    ajustarZoomMobil() {
+        const { width, height } = this.scale.gameSize;
+        const esVertical = height > width;
         
-        if (!esHoritzontal) {
-            this.mostrarAvisOrientacio();
-        }
-    }
-}
-    //coses de mobil
-    mostrarAvisOrientacio() {
-        // Crear o actualitzar l'avís
-        if (!this.avisOrientacio) {
-            this.avisOrientacio = this.add.text(
-                this.cameras.main.centerX,
-                this.cameras.main.centerY,
-                "Gira el dispositiu a mode horitzontal",
-                { 
-                    font: "24px Arial",
-                    fill: "#ffffff",
-                    backgroundColor: "#000000",
-                    padding: { x: 20, y: 10 },
-                    align: "center"
-                }
-            )
-            .setOrigin(0.5)
-            .setScrollFactor(0)
-            .setDepth(9999);
-        }
-        
-        // Amagar després de 5 segons si es torna horitzontal
-        this.time.delayedCall(5000, () => {
-            if (this.avisOrientacio) {
-                const angle = Math.abs(window.orientation);
-                if (angle === 90 || angle === 270) {
-                    this.avisOrientacio.destroy();
-                    this.avisOrientacio = null;
-                }
-            }
-        });
+        // Ajusta el zoom segons orientació
+        this.cameras.main.setZoom(esVertical ? 0.8 : 0.6);
     }
 
     createMap() {
@@ -110,7 +69,7 @@ export class MainScene extends Phaser.Scene {
             if (tile.properties.tipus === 'vidre') {
                 const tileSprite = this.mainLayer.getTileAt(tile.x, tile.y);
                 if (tileSprite) {
-                    tileSprite.alpha = 0.4; // Set transparency to 50%
+                    tileSprite.alpha = 0.4;
                 }
             }
         });
@@ -123,11 +82,11 @@ export class MainScene extends Phaser.Scene {
         this.cofres = cofres;
 
         this.physics.add.collider(this.player.sprite, this.mainLayer, null, null, {
-            tileBias: 256, // Valor extrem per a 10.000px/s
-        collisionBias: 0.8, // Màxima precisió
-        isStatic: true,
-        overlapOnly: false,
-        maxVelocity: 10000
+            tileBias: 256,
+            collisionBias: 0.8,
+            isStatic: true,
+            overlapOnly: false,
+            maxVelocity: 10000
         });
         
         this.physics.add.overlap(this.player.sprite, this.cofres, 
@@ -138,7 +97,6 @@ export class MainScene extends Phaser.Scene {
             }, 
             null, this);
     
-
         this.map.setCollisionByProperty({ colisiona: true }); 
         this.mainLayer.setCollisionByProperty({ colisiona: true });
     }
