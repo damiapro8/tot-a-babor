@@ -21,6 +21,7 @@ export class MainScene extends Phaser.Scene {
     create() {
         // Inicialitzar el jugador
         this.spawnPoint = { x: 550, y: 22000 };
+        //this.spawnPoint = { x: 15000, y: 1000 };
         this.player = new Player(this, this.spawnPoint.x, this.spawnPoint.y);
         
         // this.lootbox = new Lootbox(this, this.player);
@@ -63,7 +64,7 @@ export class MainScene extends Phaser.Scene {
             if (tile.properties.tipus === 'vidre') {
                 const tileSprite = this.mainLayer.getTileAt(tile.x, tile.y);
                 if (tileSprite) {
-                    tileSprite.alpha = 0.2; // Set transparency to 50%
+                    tileSprite.alpha = 0.4; // Set transparency to 50%
                 }
             }
         });
@@ -75,7 +76,13 @@ export class MainScene extends Phaser.Scene {
         });
         this.cofres = cofres;
 
-        this.physics.add.collider(this.player.sprite, this.mainLayer);
+        this.physics.add.collider(this.player.sprite, this.mainLayer, null, null, {
+            tileBias: 256, // Valor extrem per a 10.000px/s
+        collisionBias: 0.8, // Màxima precisió
+        isStatic: true,
+        overlapOnly: false,
+        maxVelocity: 10000
+        });
         
         this.physics.add.overlap(this.player.sprite, this.cofres, 
             (playerSprite, cofre) => {

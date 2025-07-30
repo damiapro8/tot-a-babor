@@ -254,6 +254,13 @@ export class Lootbox {
                 ],
                 icon: '⚡',
                 rarity: 'llegendari'
+            },
+            {
+                title: "VIDA+",
+                description: "Augmenta la teva vida màxima",
+                effects: [{ type: 'increasePlayerHealth', value: 1.3 }],
+                icon: '❤️',
+                rarity: 'comú'
             }
         ];
         

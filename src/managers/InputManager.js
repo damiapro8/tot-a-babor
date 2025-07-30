@@ -49,13 +49,15 @@ export class InputManager {
                 //miro si l'angle és cap avall
                 const angle = Physics.calculateMouseAngle(this.scene, this.player.sprite);
 
+                this.player.stamina.current -= force;
+                
+
                 if (this.player.esAngleAvall(angle)) {
                     force *= this.player.force.downHandicap;
                 }
 
                 this.player.applyForce(direction, force);
                 
-                this.player.stamina.current -= force;
                 this.player.force.clickTime = 0;
             }
         };

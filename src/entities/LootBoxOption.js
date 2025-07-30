@@ -127,6 +127,9 @@ export class LootboxOption {
                 case 'increasePlayerWheight':
                     this.scene.physics.world.gravity.y *= effect.value; // Ajusta la gravetat global
                     break;
+                case 'increasePlayerHealth':
+                    this.scene.player.health.max = Math.floor(this.scene.player.health.max * effect.value);
+                    break;
             }
         });
     }

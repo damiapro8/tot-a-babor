@@ -7,8 +7,10 @@ export const GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { y: 500 },
-            debug: false
+            debug: false,
+            fps: 60,
         }
+        
     },
     scene: [],
     pixelArt: true,
