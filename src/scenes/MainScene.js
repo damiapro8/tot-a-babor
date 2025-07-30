@@ -29,7 +29,7 @@ export class MainScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(0x87CEEB);
         
         // Ajustar zoom segons dispositiu
-        const zoomInicial = esDispositiuMobil() ? 0.6 : 0.3;
+        const zoomInicial = esDispositiuMobil() ? 0.3 : 0.3;
         this.cameras.main.setZoom(zoomInicial);
 
         // Inicialitzar managers
@@ -52,7 +52,7 @@ export class MainScene extends Phaser.Scene {
         const esVertical = height > width;
         
         // Ajusta el zoom segons orientació
-        this.cameras.main.setZoom(esVertical ? 0.8 : 0.6);
+        this.cameras.main.setZoom(esVertical ? 0.3 : 0.3);
     }
 
     createMap() {

@@ -17,7 +17,9 @@ export const GameConfig = {
     pixelArt: true,
     roundPixels: true,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE, // Canvi important!
+        width: '100%',  // Ocupa el 100% de l'amplada
+        height: '100%', // Ocupa el 100% de l'alçada
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     callbacks: {
