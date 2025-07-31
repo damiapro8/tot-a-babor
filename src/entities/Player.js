@@ -11,7 +11,7 @@ export class Player {
     initPhysics() {
         this.sprite.setDepth(1);
         this.sprite.setDrag(10, 0);
-        this.sprite.setMaxVelocity(2000, 3000);
+        this.sprite.setMaxVelocity(2000, 2000);
         this.sprite.body.useContinuousCollisionDetection = true;
         this.sprite.body.onCollide = true;
         this.sprite.body.slop = 2;

@@ -22,6 +22,10 @@ export const GameConfig = {
         height: '100%', // Ocupa el 100% de l'alçada
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
+    activePointers: 3, // Permet fins a 3 tocs simultànis (mínim 2 per dos dits)
+    touch: {
+        capture: true // Important per a un bon funcionament en mòbils
+    },
     callbacks: {
         postBoot: function(game) {
             if (esDispositiuMobil()) {
