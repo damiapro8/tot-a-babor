@@ -4,6 +4,7 @@ import { InputManager } from '../managers/InputManager.js';
 import { NetworkManager } from '../managers/NetworkManager.js';
 import { Lootbox } from '../entities/LootBox.js';
 import { esDispositiuMobil } from '../utils/altres.js';
+import { MobileControls } from '../managers/MobileControlsManager.js';
 
 export class MainScene extends Phaser.Scene {
     constructor() {
@@ -17,6 +18,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image('fons', '../../imatges/tileset_boig_fons.png');
         this.load.image('cofre', '../../imatges/cofre.png');
         this.load.image('casellesExtra', '../../imatges/tileset_boig2.png');
+        this.load.image('boto_mobil', '../../imatges/botó_mobil.png');
     }
 
     create() {
@@ -29,7 +31,7 @@ export class MainScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(0x87CEEB);
         
         // Ajustar zoom segons dispositiu
-        const zoomInicial = esDispositiuMobil() ? 0.3 : 0.3;
+        const zoomInicial = esDispositiuMobil() ? 0.2 : 0.3;
         this.cameras.main.setZoom(zoomInicial);
 
         // Inicialitzar managers
@@ -42,6 +44,7 @@ export class MainScene extends Phaser.Scene {
 
         // Configuració responsive per a mòbils
         if (esDispositiuMobil()) {
+            this.mobileControls = new MobileControls(this, this.inputManager);
             this.scale.on('resize', this.ajustarZoomMobil, this);
             this.ajustarZoomMobil();
         }
@@ -52,7 +55,7 @@ export class MainScene extends Phaser.Scene {
         const esVertical = height > width;
         
         // Ajusta el zoom segons orientació
-        this.cameras.main.setZoom(esVertical ? 0.3 : 0.3);
+        this.cameras.main.setZoom(esVertical ? 0.2 : 0.2);
     }
 
     createMap() {
@@ -115,5 +118,11 @@ export class MainScene extends Phaser.Scene {
         this.uiManager.update();
         this.networkManager.update();
         this.inputManager.update();
+    }
+
+    destroy() {
+        if (this.mobileControls) {
+            this.mobileControls.destroy();
+        }
     }
 }

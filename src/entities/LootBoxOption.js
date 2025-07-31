@@ -1,9 +1,9 @@
 export class LootboxOption {
-    constructor(scene, x, y, width, height, optionData) {
+    constructor(scene, x, y, width, height, optionData, esDispositiuMobil) {
         this.scene = scene;
         this.optionData = optionData;
         this.isSelected = false;
-        
+        this.fontSize = esDispositiuMobil ? width * 0.13 : width * 0.07;
         // Fons amb bordes i ombra
         this.background = scene.add.rectangle(x, y, width, height, this.getColorForRarity(optionData.rarity))
             .setOrigin(0.5, 0)
@@ -19,8 +19,8 @@ export class LootboxOption {
             .setAlpha(0)
             .setDepth(-1);
         // text de raresa
-        this.rarityText = scene.add.text(x, y + 10, optionData.rarity.toUpperCase(), {
-            fontSize: '40px',
+        this.rarityText = scene.add.text(x, y + this.fontSize * 0.1, optionData.rarity.toUpperCase(), {
+            fontSize: `${this.fontSize}px`,
             fill: '#fffb00ff',
             fontFamily: 'Arial',
             align: 'center',
@@ -28,22 +28,23 @@ export class LootboxOption {
         }).setOrigin(0.5, 0);
 
         // Icona representativa
-        this.icon = scene.add.text(x, y + 60, optionData.icon, {
-            fontSize: '120px',
+        this.icon = scene.add.text(x, y + this.fontSize * 1.5, optionData.icon, {
+            fontSize: `${this.fontSize * 1.5}px`,
         }).setOrigin(0.5, 0);
         
         // Títol
-        this.title = scene.add.text(x, y + 190, optionData.title, {
-            fontSize: '50px',
+        this.title = scene.add.text(x, y + this.fontSize * 3, optionData.title, {
+            fontSize: `${this.fontSize * 1.0}px`,
             fill: '#FFFFFF',
             fontFamily: 'Arial',
             align: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            wordWrap: { width: esDispositiuMobil ? width - 90: width - 40 },
         }).setOrigin(0.5, 0);
         
         // Descripció
-        this.description = scene.add.text(x, y + 270, optionData.description, {
-            fontSize: '40px',
+        this.description = scene.add.text(x, y + this.fontSize * 6.5, optionData.description, {
+            fontSize: `${this.fontSize * 0.8}px`,
             fill: '#CCCCCC',
             fontFamily: 'Arial',
             align: 'center',

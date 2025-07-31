@@ -1,4 +1,5 @@
 import { LootboxOption } from './LootBoxOption.js';
+import { esDispositiuMobil } from '../utils/altres.js';
 
 export class Lootbox {
     constructor(scene, player) {
@@ -18,35 +19,36 @@ export class Lootbox {
         const screenHeight = this.scene.sys.game.scale.height;
         // Fons semi-transparent que ocupa tota la pantalla
         this.background = this.scene.add.rectangle(
-            screenWidth / 2, screenHeight / 2,
-            screenWidth * 2,
-            screenHeight * 2,
-            0x000000, 0.7
+            screenWidth / 2.0, screenHeight / 2.0,
+            999999,
+            999999,
+            0x000000, 0.6
         )
         .setOrigin(0.5, 0.5)
         .setScrollFactor(0)
         .setDepth(1005)
         .setInteractive();
-        
+        const optionSpacing = 20; // Espai entre opcions
         // Configuració de la lootbox (80% de l'amplada de pantalla)
-        const lootboxWidth = screenWidth * 1.3;
-        const optionWidth = (lootboxWidth - 100) / 3; // 3 opcions amb espai
-        const optionHeight = screenHeight;
+        const lootboxWidth = esDispositiuMobil() ? screenWidth * 4.5 : screenWidth * 2.0;
+        const optionWidth = (lootboxWidth - optionSpacing * 3.0) / 3.0; // 3 opcions amb espai
+        const optionHeight = screenHeight * 2; // Altura fixa per a les opcions
         
         // Posició inicial (centrat)
-        const startX = (screenWidth - lootboxWidth) / 2 + optionWidth/2;
-        const startY = screenHeight * 0.15;
+        const startX = esDispositiuMobil() ? - screenWidth / 1 : - screenWidth / 6.0;
+        const startY = - screenHeight;
         
         // Crear 3 opcions
         for (let i = 0; i < 3; i++) {
-            const x = startX + i * (optionWidth + 50);
+            const x = startX + i * (optionWidth + optionSpacing);
             const option = new LootboxOption(
                 this.scene,
                 x,
                 startY,
                 optionWidth,
                 optionHeight,
-                optionsData[i]
+                optionsData[i],
+                esDispositiuMobil()
             );
             option.background.setScrollFactor(0).setDepth(1009);
             option.title.setScrollFactor(0).setDepth(1010);
@@ -57,7 +59,7 @@ export class Lootbox {
         }
         
         // Botó de confirmació gran
-        this.createSelectButton(screenWidth/2, startY + optionHeight + 50);
+        this.createSelectButton(screenWidth/2, startY + optionHeight + screenHeight * 0.3);
         
         // Pausar el joc
         this.scene.physics.pause();
@@ -66,10 +68,10 @@ export class Lootbox {
     
     createSelectButton(x, y) {
         this.selectButton = this.scene.add.text(x, y, 'CONFIRMAR SELECCIÓ', {
-            fontSize: '36px',
+            fontSize: `${esDispositiuMobil() ? 80 : 60}px`,
             fill: '#FFFFFF',
             backgroundColor: '#4a4a8f',
-            padding: { x: 40, y: 20 },
+            padding: { x: 160, y: 80 },
             fontFamily: 'Arial',
             fontStyle: 'bold'
         })

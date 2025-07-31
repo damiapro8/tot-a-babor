@@ -2,8 +2,8 @@ import { esDispositiuMobil  } from '../utils/altres.js';
 
 export const GameConfig = {
     type: Phaser.AUTO,
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: window.innerWidth * window.devicePixelRatio,
+    height: window.innerHeight * window.devicePixelRatio,
     parent: "game-container",
     physics: {
         default: 'arcade',
@@ -33,7 +33,6 @@ export const GameConfig = {
                 //             escenaPrincipal.mostrarAvisOrientacio();
                 //         }
                 //     });
-                
                 window.addEventListener('resize', () => {
                     game.scale.resize(window.innerWidth, window.innerHeight);
                 });

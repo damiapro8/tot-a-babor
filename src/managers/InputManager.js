@@ -4,7 +4,8 @@ export class InputManager {
     constructor(scene, player) {
         this.scene = scene;
         this.player = player;
-        this.inputEnabled = false; // Desactivat per defecte
+        this.inputEnabled = false;
+        this.mobileInputDisabled = false;
         this.initKeyboardInput();
         this.initMouseInput();
     }
@@ -23,7 +24,7 @@ export class InputManager {
         this.scene.input.mouse.disableContextMenu();
         
         this.pointerDownHandler = (pointer) => {
-            if (!this.inputEnabled) return;
+            if (!this.inputEnabled || this.mobileInputDisabled) return;
             
             if (pointer.leftButtonDown() && !this.player.isClicking) {
                 this.player.isClicking = true;
@@ -32,7 +33,7 @@ export class InputManager {
         };
         
         this.pointerUpHandler = (pointer) => {
-            if (!this.inputEnabled) return;
+            if (!this.inputEnabled || this.mobileInputDisabled) return;
             
             if (pointer.leftButtonReleased() && this.player.isClicking) {
                 this.player.isClicking = false;
